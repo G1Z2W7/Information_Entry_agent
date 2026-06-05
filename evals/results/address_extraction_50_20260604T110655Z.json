@@ -1,0 +1,4057 @@
+{
+  "run_at": "2026-06-04T11:06:55.030430+00:00",
+  "case_file": "/workspace/evals/cases/address_extraction_50.jsonl",
+  "model": "deepseek-v4-flash",
+  "metrics": {
+    "case_count": 50,
+    "exact_match_cases": 28,
+    "exact_match_rate": 0.56,
+    "field_precision": 0.8796,
+    "field_recall": 0.9882,
+    "field_f1": 0.9307,
+    "average_latency_seconds": 4.461,
+    "errored_cases": 0
+  },
+  "scene_metrics": {
+    "full_address": {
+      "case_count": 10,
+      "exact_match_rate": 1.0,
+      "field_precision": 1.0,
+      "field_recall": 1.0,
+      "field_f1": 1.0,
+      "average_latency_seconds": 3.092
+    },
+    "missing_city": {
+      "case_count": 10,
+      "exact_match_rate": 0.6,
+      "field_precision": 0.8824,
+      "field_recall": 1.0,
+      "field_f1": 0.9375,
+      "average_latency_seconds": 7.077
+    },
+    "missing_detail": {
+      "case_count": 10,
+      "exact_match_rate": 0.9,
+      "field_precision": 0.95,
+      "field_recall": 0.95,
+      "field_f1": 0.95,
+      "average_latency_seconds": 2.919
+    },
+    "missing_district": {
+      "case_count": 10,
+      "exact_match_rate": 0.1,
+      "field_precision": 0.7692,
+      "field_recall": 1.0,
+      "field_f1": 0.8695,
+      "average_latency_seconds": 4.86
+    },
+    "missing_province": {
+      "case_count": 10,
+      "exact_match_rate": 0.2,
+      "field_precision": 0.7895,
+      "field_recall": 1.0,
+      "field_f1": 0.8824,
+      "average_latency_seconds": 4.36
+    }
+  },
+  "cases": [
+    {
+      "case_id": "addr_full_address_01",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在浙江省杭州市西湖区文三路18号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市西湖区文三路18号",
+            "provinceName": "浙江省",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市西湖区文三路18号",
+            "provinceName": "浙江省",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市西湖区文三路18号",
+            "provinceName": "浙江省",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "浙江省杭州市西湖区文三路18号",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].cityName": "杭州市",
+        "sites[0].districtName": "西湖区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "浙江省杭州市西湖区文三路18号",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].cityName": "杭州市",
+        "sites[0].districtName": "西湖区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.724,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "浙江省杭州市西湖区文三路18号",
+          "actual": "浙江省杭州市西湖区文三路18号"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "浙江省",
+          "actual": "浙江省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "杭州市",
+          "actual": "杭州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "西湖区",
+          "actual": "西湖区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_02",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在广东省深圳市南山区科技园科苑路15号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "广东省深圳市南山区科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市",
+        "sites[0].districtName": "南山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "广东省深圳市南山区科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市",
+        "sites[0].districtName": "南山区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.571,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "广东省深圳市南山区科技园科苑路15号",
+          "actual": "广东省深圳市南山区科技园科苑路15号"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "广东省",
+          "actual": "广东省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "深圳市",
+          "actual": "深圳市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "南山区",
+          "actual": "南山区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_03",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在四川省成都市武侯区武兴四路166号西部智谷D区2栋。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "四川省成都市武侯区武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市",
+        "sites[0].districtName": "武侯区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "四川省成都市武侯区武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市",
+        "sites[0].districtName": "武侯区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.84,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "四川省成都市武侯区武兴四路166号西部智谷D区2栋",
+          "actual": "四川省成都市武侯区武兴四路166号西部智谷D区2栋"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "四川省",
+          "actual": "四川省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "成都市",
+          "actual": "成都市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "武侯区",
+          "actual": "武侯区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_04",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在江苏省苏州市工业园区星湖街218号生物纳米园A3楼。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市",
+        "sites[0].districtName": "工业园区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市",
+        "sites[0].districtName": "工业园区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.758,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼",
+          "actual": "江苏省苏州市工业园区星湖街218号生物纳米园A3楼"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "江苏省",
+          "actual": "江苏省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "苏州市",
+          "actual": "苏州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "工业园区",
+          "actual": "工业园区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_05",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在湖北省武汉市洪山区珞喻路889号光谷中心花园。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市洪山区珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市洪山区珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市洪山区珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "湖北省武汉市洪山区珞喻路889号光谷中心花园",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "湖北省武汉市洪山区珞喻路889号光谷中心花园",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.039,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "湖北省武汉市洪山区珞喻路889号光谷中心花园",
+          "actual": "湖北省武汉市洪山区珞喻路889号光谷中心花园"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "湖北省",
+          "actual": "湖北省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "武汉市",
+          "actual": "武汉市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "洪山区",
+          "actual": "洪山区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_06",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在山东省青岛市市北区延吉路116号万达广场。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "山东省青岛市市北区延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "山东省青岛市市北区延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.519,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "山东省青岛市市北区延吉路116号万达广场",
+          "actual": "山东省青岛市市北区延吉路116号万达广场"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "山东省",
+          "actual": "山东省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "青岛市",
+          "actual": "青岛市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "市北区",
+          "actual": "市北区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_07",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在福建省厦门市思明区湖滨南路258号鸿翔大厦。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "福建省厦门市思明区湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].cityName": "厦门市",
+        "sites[0].districtName": "思明区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "福建省厦门市思明区湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].cityName": "厦门市",
+        "sites[0].districtName": "思明区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.423,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "福建省厦门市思明区湖滨南路258号鸿翔大厦",
+          "actual": "福建省厦门市思明区湖滨南路258号鸿翔大厦"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "福建省",
+          "actual": "福建省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "厦门市",
+          "actual": "厦门市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "思明区",
+          "actual": "思明区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_08",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在河南省郑州市金水区花园路39号国贸360。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "河南省郑州市金水区花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市",
+        "sites[0].districtName": "金水区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "河南省郑州市金水区花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市",
+        "sites[0].districtName": "金水区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.585,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "河南省郑州市金水区花园路39号国贸360",
+          "actual": "河南省郑州市金水区花园路39号国贸360"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "河南省",
+          "actual": "河南省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "郑州市",
+          "actual": "郑州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "金水区",
+          "actual": "金水区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_09",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在陕西省西安市雁塔区科技路33号高新国际商务中心。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "陕西省西安市雁塔区科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市",
+        "sites[0].districtName": "雁塔区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "陕西省西安市雁塔区科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市",
+        "sites[0].districtName": "雁塔区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.849,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "陕西省西安市雁塔区科技路33号高新国际商务中心",
+          "actual": "陕西省西安市雁塔区科技路33号高新国际商务中心"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "陕西省",
+          "actual": "陕西省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "西安市",
+          "actual": "西安市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "雁塔区",
+          "actual": "雁塔区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_full_address_10",
+      "scene": "full_address",
+      "tags": [
+        "full_address",
+        "address"
+      ],
+      "message": "门店地址在辽宁省沈阳市铁西区建设东路158号万象汇。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "辽宁省沈阳市铁西区建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市",
+        "sites[0].districtName": "铁西区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "辽宁省沈阳市铁西区建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市",
+        "sites[0].districtName": "铁西区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.612,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "辽宁省沈阳市铁西区建设东路158号万象汇",
+          "actual": "辽宁省沈阳市铁西区建设东路158号万象汇"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "辽宁省",
+          "actual": "辽宁省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "沈阳市",
+          "actual": "沈阳市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "铁西区",
+          "actual": "铁西区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_01",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是杭州市西湖区文三路18号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "杭州市西湖区文三路18号",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "杭州市西湖区文三路18号",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "杭州市西湖区文三路18号",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "杭州市西湖区文三路18号",
+        "sites[0].cityName": "杭州市",
+        "sites[0].districtName": "西湖区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "杭州市西湖区文三路18号",
+        "sites[0].cityName": "杭州市",
+        "sites[0].districtName": "西湖区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.943,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "杭州市西湖区文三路18号",
+          "actual": "杭州市西湖区文三路18号"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "杭州市",
+          "actual": "杭州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "西湖区",
+          "actual": "西湖区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_02",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是深圳市南山区科技园科苑路15号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "深圳市南山区科技园科苑路15号",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "深圳市南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "深圳市南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "深圳市南山区科技园科苑路15号",
+        "sites[0].cityName": "深圳市",
+        "sites[0].districtName": "南山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "深圳市南山区科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市",
+        "sites[0].districtName": "南山区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 3.777,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "深圳市南山区科技园科苑路15号",
+          "actual": "深圳市南山区科技园科苑路15号"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "深圳市",
+          "actual": "深圳市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "南山区",
+          "actual": "南山区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "广东省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_03",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是成都市武侯区武兴四路166号西部智谷D区2栋。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "成都市武侯区武兴四路166号西部智谷D区2栋",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "成都市武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "成都市武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "成都市武侯区武兴四路166号西部智谷D区2栋",
+        "sites[0].cityName": "成都市",
+        "sites[0].districtName": "武侯区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "成都市武侯区武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市",
+        "sites[0].districtName": "武侯区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 2.841,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "成都市武侯区武兴四路166号西部智谷D区2栋",
+          "actual": "成都市武侯区武兴四路166号西部智谷D区2栋"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "成都市",
+          "actual": "成都市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "武侯区",
+          "actual": "武侯区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "四川省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_04",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是苏州市工业园区星湖街218号生物纳米园A3楼。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "苏州市工业园区星湖街218号生物纳米园A3楼",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "苏州市工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "苏州市工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "苏州市工业园区星湖街218号生物纳米园A3楼",
+        "sites[0].cityName": "苏州市",
+        "sites[0].districtName": "工业园区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "苏州市工业园区星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市",
+        "sites[0].districtName": "工业园区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 3.519,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "苏州市工业园区星湖街218号生物纳米园A3楼",
+          "actual": "苏州市工业园区星湖街218号生物纳米园A3楼"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "苏州市",
+          "actual": "苏州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "工业园区",
+          "actual": "工业园区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "江苏省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_05",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是武汉市洪山区珞喻路889号光谷中心花园。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "武汉市洪山区珞喻路889号光谷中心花园",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "武汉市洪山区珞喻路889号光谷中心花园",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "武汉市洪山区珞喻路889号光谷中心花园",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "武汉市洪山区珞喻路889号光谷中心花园",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "武汉市洪山区珞喻路889号光谷中心花园",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 4.349,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "武汉市洪山区珞喻路889号光谷中心花园",
+          "actual": "武汉市洪山区珞喻路889号光谷中心花园"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "武汉市",
+          "actual": "武汉市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "洪山区",
+          "actual": "洪山区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_06",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是青岛市市北区延吉路116号万达广场。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "青岛市市北区延吉路116号万达广场",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "青岛市市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "青岛市市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "青岛市市北区延吉路116号万达广场",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "青岛市市北区延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 6.032,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "青岛市市北区延吉路116号万达广场",
+          "actual": "青岛市市北区延吉路116号万达广场"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "青岛市",
+          "actual": "青岛市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "市北区",
+          "actual": "市北区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "山东省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_07",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是厦门市思明区湖滨南路258号鸿翔大厦。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "厦门市思明区湖滨南路258号鸿翔大厦",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "厦门市思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "厦门市思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "厦门市思明区湖滨南路258号鸿翔大厦",
+        "sites[0].cityName": "厦门市",
+        "sites[0].districtName": "思明区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "厦门市思明区湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].cityName": "厦门市",
+        "sites[0].districtName": "思明区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 4.872,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "厦门市思明区湖滨南路258号鸿翔大厦",
+          "actual": "厦门市思明区湖滨南路258号鸿翔大厦"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "厦门市",
+          "actual": "厦门市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "思明区",
+          "actual": "思明区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "福建省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_08",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是郑州市金水区花园路39号国贸360。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "郑州市金水区花园路39号国贸360",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "郑州市金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "郑州市金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "郑州市金水区花园路39号国贸360",
+        "sites[0].cityName": "郑州市",
+        "sites[0].districtName": "金水区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "郑州市金水区花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市",
+        "sites[0].districtName": "金水区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 5.018,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "郑州市金水区花园路39号国贸360",
+          "actual": "郑州市金水区花园路39号国贸360"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "郑州市",
+          "actual": "郑州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "金水区",
+          "actual": "金水区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "河南省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_09",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是西安市雁塔区科技路33号高新国际商务中心。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "西安市雁塔区科技路33号高新国际商务中心",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "西安市雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "西安市雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "西安市雁塔区科技路33号高新国际商务中心",
+        "sites[0].cityName": "西安市",
+        "sites[0].districtName": "雁塔区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "西安市雁塔区科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市",
+        "sites[0].districtName": "雁塔区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 2.561,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "西安市雁塔区科技路33号高新国际商务中心",
+          "actual": "西安市雁塔区科技路33号高新国际商务中心"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "西安市",
+          "actual": "西安市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "雁塔区",
+          "actual": "雁塔区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "陕西省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_province_10",
+      "scene": "missing_province",
+      "tags": [
+        "missing_province",
+        "address"
+      ],
+      "message": "门店位置是沈阳市铁西区建设东路158号万象汇。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "沈阳市铁西区建设东路158号万象汇",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "沈阳市铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "沈阳市铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "沈阳市铁西区建设东路158号万象汇",
+        "sites[0].cityName": "沈阳市",
+        "sites[0].districtName": "铁西区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "沈阳市铁西区建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市",
+        "sites[0].districtName": "铁西区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 6.684,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "沈阳市铁西区建设东路158号万象汇",
+          "actual": "沈阳市铁西区建设东路158号万象汇"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "沈阳市",
+          "actual": "沈阳市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "铁西区",
+          "actual": "铁西区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": null,
+          "actual": "辽宁省"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_01",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成浙江省西湖区文三路18号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省西湖区文三路18号",
+            "provinceName": "浙江省",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "维修站",
+            "fullAddress": "浙江省西湖区文三路18号",
+            "provinceName": "浙江省",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "维修站",
+            "fullAddress": "浙江省西湖区文三路18号",
+            "provinceName": "浙江省",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "浙江省西湖区文三路18号",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].districtName": "西湖区"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "维修站",
+        "sites[0].fullAddress": "浙江省西湖区文三路18号",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].districtName": "西湖区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 10.01,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "浙江省西湖区文三路18号",
+          "actual": "浙江省西湖区文三路18号"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "浙江省",
+          "actual": "浙江省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "西湖区",
+          "actual": "西湖区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "维修站"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_02",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成广东省南山区科技园科苑路15号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省南山区科技园科苑路15号",
+            "provinceName": "广东省",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "广东省南山区科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].districtName": "南山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "广东省南山区科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].districtName": "南山区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 6.561,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "广东省南山区科技园科苑路15号",
+          "actual": "广东省南山区科技园科苑路15号"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "广东省",
+          "actual": "广东省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "南山区",
+          "actual": "南山区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_03",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成四川省武侯区武兴四路166号西部智谷D区2栋。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "districtName": "武侯区",
+            "siteType": "维修站"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "维修站",
+            "fullAddress": "四川省武侯区武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "四川省武侯区武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].districtName": "武侯区"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "维修站",
+        "sites[0].fullAddress": "四川省武侯区武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].districtName": "武侯区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 8.588,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "四川省武侯区武兴四路166号西部智谷D区2栋",
+          "actual": "四川省武侯区武兴四路166号西部智谷D区2栋"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "四川省",
+          "actual": "四川省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "武侯区",
+          "actual": "武侯区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "维修站"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_04",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成江苏省工业园区星湖街218号生物纳米园A3楼。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省工业园区星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "江苏省工业园区星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].districtName": "工业园区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "江苏省工业园区星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].districtName": "工业园区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 5.08,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "江苏省工业园区星湖街218号生物纳米园A3楼",
+          "actual": "江苏省工业园区星湖街218号生物纳米园A3楼"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "江苏省",
+          "actual": "江苏省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "工业园区",
+          "actual": "工业园区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_05",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成湖北省洪山区珞喻路889号光谷中心花园。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省洪山区珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省洪山区珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省洪山区珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "湖北省洪山区珞喻路889号光谷中心花园",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].districtName": "洪山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "湖北省洪山区珞喻路889号光谷中心花园",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 7.376,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "湖北省洪山区珞喻路889号光谷中心花园",
+          "actual": "湖北省洪山区珞喻路889号光谷中心花园"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "湖北省",
+          "actual": "湖北省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "洪山区",
+          "actual": "洪山区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].cityName",
+          "expected": null,
+          "actual": "武汉市"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_06",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成山东省市北区延吉路116号万达广场。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省市北区延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "山东省市北区延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].districtName": "市北区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "山东省市北区延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 9.119,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "山东省市北区延吉路116号万达广场",
+          "actual": "山东省市北区延吉路116号万达广场"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "山东省",
+          "actual": "山东省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "市北区",
+          "actual": "市北区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].cityName",
+          "expected": null,
+          "actual": "青岛市"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_07",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成福建省思明区湖滨南路258号鸿翔大厦。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省思明区湖滨南路258号鸿翔大厦"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省思明区湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "福建省思明区湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].districtName": "思明区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "福建省思明区湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].districtName": "思明区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 7.349,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "福建省思明区湖滨南路258号鸿翔大厦",
+          "actual": "福建省思明区湖滨南路258号鸿翔大厦"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "福建省",
+          "actual": "福建省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "思明区",
+          "actual": "思明区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_08",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成河南省金水区花园路39号国贸360。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省金水区花园路39号国贸360",
+            "provinceName": "河南省",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "河南省金水区花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].districtName": "金水区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "河南省金水区花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].districtName": "金水区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 5.397,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "河南省金水区花园路39号国贸360",
+          "actual": "河南省金水区花园路39号国贸360"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "河南省",
+          "actual": "河南省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "金水区",
+          "actual": "金水区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_09",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成陕西省雁塔区科技路33号高新国际商务中心。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省雁塔区科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "陕西省雁塔区科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].districtName": "雁塔区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "陕西省雁塔区科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].districtName": "雁塔区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 6.28,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "陕西省雁塔区科技路33号高新国际商务中心",
+          "actual": "陕西省雁塔区科技路33号高新国际商务中心"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "陕西省",
+          "actual": "陕西省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "雁塔区",
+          "actual": "雁塔区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_city_10",
+      "scene": "missing_city",
+      "tags": [
+        "missing_city",
+        "address"
+      ],
+      "message": "维修站地址写成辽宁省铁西区建设东路158号万象汇。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省铁西区建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "辽宁省铁西区建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].districtName": "铁西区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "辽宁省铁西区建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].districtName": "铁西区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 5.008,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "辽宁省铁西区建设东路158号万象汇",
+          "actual": "辽宁省铁西区建设东路158号万象汇"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "辽宁省",
+          "actual": "辽宁省"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "铁西区",
+          "actual": "铁西区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_01",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在浙江省杭州市文三路18号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市文三路18号",
+            "provinceName": "浙江省",
+            "cityName": "杭州市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "浙江省杭州市文三路18号",
+            "provinceName": "浙江省",
+            "cityName": "杭州市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "浙江省杭州市文三路18号",
+            "provinceName": "浙江省",
+            "cityName": "杭州市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "浙江省杭州市文三路18号",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].cityName": "杭州市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "浙江省杭州市文三路18号",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].cityName": "杭州市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 4.102,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "浙江省杭州市文三路18号",
+          "actual": "浙江省杭州市文三路18号"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "浙江省",
+          "actual": "浙江省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "杭州市",
+          "actual": "杭州市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_02",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在广东省深圳市科技园科苑路15号。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "广东省深圳市科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "广东省深圳市科技园科苑路15号",
+            "provinceName": "广东省",
+            "cityName": "深圳市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "广东省深圳市科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "广东省深圳市科技园科苑路15号",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 5.363,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "广东省深圳市科技园科苑路15号",
+          "actual": "广东省深圳市科技园科苑路15号"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "广东省",
+          "actual": "广东省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "深圳市",
+          "actual": "深圳市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_03",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在四川省成都市武兴四路166号西部智谷D区2栋。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "四川省成都市武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "四川省成都市武兴四路166号西部智谷D区2栋",
+            "provinceName": "四川省",
+            "cityName": "成都市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "四川省成都市武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "四川省成都市武兴四路166号西部智谷D区2栋",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 4.224,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "四川省成都市武兴四路166号西部智谷D区2栋",
+          "actual": "四川省成都市武兴四路166号西部智谷D区2栋"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "四川省",
+          "actual": "四川省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "成都市",
+          "actual": "成都市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_04",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在江苏省苏州市星湖街218号生物纳米园A3楼。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市星湖街218号生物纳米园A3楼",
+            "provinceName": "江苏省",
+            "cityName": "苏州市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "江苏省苏州市星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "江苏省苏州市星湖街218号生物纳米园A3楼",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 4.34,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "江苏省苏州市星湖街218号生物纳米园A3楼",
+          "actual": "江苏省苏州市星湖街218号生物纳米园A3楼"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "江苏省",
+          "actual": "江苏省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "苏州市",
+          "actual": "苏州市"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_05",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在湖北省武汉市珞喻路889号光谷中心花园。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "siteType": "仓库"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "湖北省武汉市珞喻路889号光谷中心花园",
+            "provinceName": "湖北省",
+            "cityName": "武汉市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "湖北省武汉市珞喻路889号光谷中心花园",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "湖北省武汉市珞喻路889号光谷中心花园",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 4.408,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "湖北省武汉市珞喻路889号光谷中心花园",
+          "actual": "湖北省武汉市珞喻路889号光谷中心花园"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "湖北省",
+          "actual": "湖北省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "武汉市",
+          "actual": "武汉市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_06",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在山东省青岛市延吉路116号万达广场。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "山东省青岛市延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "山东省青岛市延吉路116号万达广场",
+            "provinceName": "山东省",
+            "cityName": "青岛市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "山东省青岛市延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "山东省青岛市延吉路116号万达广场",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 6.517,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "山东省青岛市延吉路116号万达广场",
+          "actual": "山东省青岛市延吉路116号万达广场"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "山东省",
+          "actual": "山东省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "青岛市",
+          "actual": "青岛市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_07",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在福建省厦门市湖滨南路258号鸿翔大厦。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "福建省厦门市湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "福建省厦门市湖滨南路258号鸿翔大厦",
+            "provinceName": "福建省",
+            "cityName": "厦门市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "福建省厦门市湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].cityName": "厦门市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "福建省厦门市湖滨南路258号鸿翔大厦",
+        "sites[0].provinceName": "福建省",
+        "sites[0].cityName": "厦门市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 4.804,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "福建省厦门市湖滨南路258号鸿翔大厦",
+          "actual": "福建省厦门市湖滨南路258号鸿翔大厦"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "福建省",
+          "actual": "福建省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "厦门市",
+          "actual": "厦门市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_08",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在河南省郑州市花园路39号国贸360。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "河南省郑州市花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "河南省郑州市花园路39号国贸360",
+            "provinceName": "河南省",
+            "cityName": "郑州市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "河南省郑州市花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "河南省郑州市花园路39号国贸360",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 5.17,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "河南省郑州市花园路39号国贸360",
+          "actual": "河南省郑州市花园路39号国贸360"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "河南省",
+          "actual": "河南省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "郑州市",
+          "actual": "郑州市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_09",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在陕西省西安市科技路33号高新国际商务中心。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "陕西省西安市科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "陕西省西安市科技路33号高新国际商务中心",
+            "provinceName": "陕西省",
+            "cityName": "西安市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "陕西省西安市科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "陕西省西安市科技路33号高新国际商务中心",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 5.063,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "陕西省西安市科技路33号高新国际商务中心",
+          "actual": "陕西省西安市科技路33号高新国际商务中心"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "陕西省",
+          "actual": "陕西省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "西安市",
+          "actual": "西安市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_district_10",
+      "scene": "missing_district",
+      "tags": [
+        "missing_district",
+        "address"
+      ],
+      "message": "仓库在辽宁省沈阳市建设东路158号万象汇。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "辽宁省沈阳市建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "siteType": "仓库",
+            "fullAddress": "辽宁省沈阳市建设东路158号万象汇",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "辽宁省沈阳市建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市"
+      },
+      "predicted_flat": {
+        "sites[0].siteType": "仓库",
+        "sites[0].fullAddress": "辽宁省沈阳市建设东路158号万象汇",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 4.611,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 3,
+      "false_positive_count": 1,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "辽宁省沈阳市建设东路158号万象汇",
+          "actual": "辽宁省沈阳市建设东路158号万象汇"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "辽宁省",
+          "actual": "辽宁省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "沈阳市",
+          "actual": "沈阳市"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].siteType",
+          "expected": null,
+          "actual": "仓库"
+        }
+      ],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_01",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是浙江省杭州市西湖区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市西湖区",
+            "provinceName": "浙江省",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市西湖区",
+            "provinceName": "浙江省",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "浙江省杭州市西湖区",
+            "provinceName": "浙江省",
+            "cityName": "杭州市",
+            "districtName": "西湖区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "浙江省杭州市西湖区",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].cityName": "杭州市",
+        "sites[0].districtName": "西湖区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "浙江省杭州市西湖区",
+        "sites[0].provinceName": "浙江省",
+        "sites[0].cityName": "杭州市",
+        "sites[0].districtName": "西湖区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.264,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "浙江省杭州市西湖区",
+          "actual": "浙江省杭州市西湖区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "浙江省",
+          "actual": "浙江省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "杭州市",
+          "actual": "杭州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "西湖区",
+          "actual": "西湖区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_02",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是广东省深圳市南山区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市南山区",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市南山区",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "广东省深圳市南山区",
+            "provinceName": "广东省",
+            "cityName": "深圳市",
+            "districtName": "南山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "广东省深圳市南山区",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市",
+        "sites[0].districtName": "南山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "广东省深圳市南山区",
+        "sites[0].provinceName": "广东省",
+        "sites[0].cityName": "深圳市",
+        "sites[0].districtName": "南山区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.331,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "广东省深圳市南山区",
+          "actual": "广东省深圳市南山区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "广东省",
+          "actual": "广东省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "深圳市",
+          "actual": "深圳市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "南山区",
+          "actual": "南山区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_03",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是四川省成都市武侯区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武侯区",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武侯区",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "四川省成都市武侯区",
+            "provinceName": "四川省",
+            "cityName": "成都市",
+            "districtName": "武侯区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "四川省成都市武侯区",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市",
+        "sites[0].districtName": "武侯区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "四川省成都市武侯区",
+        "sites[0].provinceName": "四川省",
+        "sites[0].cityName": "成都市",
+        "sites[0].districtName": "武侯区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.245,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "四川省成都市武侯区",
+          "actual": "四川省成都市武侯区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "四川省",
+          "actual": "四川省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "成都市",
+          "actual": "成都市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "武侯区",
+          "actual": "武侯区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_04",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是江苏省苏州市工业园区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市工业园区",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市工业园区",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "江苏省苏州市工业园区",
+            "provinceName": "江苏省",
+            "cityName": "苏州市",
+            "districtName": "工业园区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "江苏省苏州市工业园区",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市",
+        "sites[0].districtName": "工业园区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "江苏省苏州市工业园区",
+        "sites[0].provinceName": "江苏省",
+        "sites[0].cityName": "苏州市",
+        "sites[0].districtName": "工业园区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.759,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "江苏省苏州市工业园区",
+          "actual": "江苏省苏州市工业园区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "江苏省",
+          "actual": "江苏省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "苏州市",
+          "actual": "苏州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "工业园区",
+          "actual": "工业园区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_05",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是湖北省武汉市洪山区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市洪山区",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市洪山区",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "湖北省武汉市洪山区",
+            "provinceName": "湖北省",
+            "cityName": "武汉市",
+            "districtName": "洪山区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "湖北省武汉市洪山区",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "湖北省武汉市洪山区",
+        "sites[0].provinceName": "湖北省",
+        "sites[0].cityName": "武汉市",
+        "sites[0].districtName": "洪山区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.66,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "湖北省武汉市洪山区",
+          "actual": "湖北省武汉市洪山区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "湖北省",
+          "actual": "湖北省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "武汉市",
+          "actual": "武汉市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "洪山区",
+          "actual": "洪山区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_06",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是山东省青岛市市北区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市市北区",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市市北区",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "山东省青岛市市北区",
+            "provinceName": "山东省",
+            "cityName": "青岛市",
+            "districtName": "市北区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "山东省青岛市市北区",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "山东省青岛市市北区",
+        "sites[0].provinceName": "山东省",
+        "sites[0].cityName": "青岛市",
+        "sites[0].districtName": "市北区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.782,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "山东省青岛市市北区",
+          "actual": "山东省青岛市市北区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "山东省",
+          "actual": "山东省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "青岛市",
+          "actual": "青岛市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "市北区",
+          "actual": "市北区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_07",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是福建省厦门市思明区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市思明区",
+            "provinceName": "福建省",
+            "cityName": "厦门市",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市思明区",
+            "provinceName": "福建",
+            "cityName": "厦门",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "福建省厦门市思明区",
+            "provinceName": "福建",
+            "cityName": "厦门",
+            "districtName": "思明区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "福建省厦门市思明区",
+        "sites[0].provinceName": "福建省",
+        "sites[0].cityName": "厦门市",
+        "sites[0].districtName": "思明区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "福建省厦门市思明区",
+        "sites[0].provinceName": "福建",
+        "sites[0].cityName": "厦门",
+        "sites[0].districtName": "思明区"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 2.643,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 2,
+      "false_positive_count": 2,
+      "false_negative_count": 2,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "福建省厦门市思明区",
+          "actual": "福建省厦门市思明区"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "思明区",
+          "actual": "思明区"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": "福建省",
+          "actual": "福建"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "厦门市",
+          "actual": "厦门"
+        }
+      ],
+      "false_negatives": [
+        {
+          "path": "sites[0].provinceName",
+          "expected": "福建省",
+          "actual": "福建"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "厦门市",
+          "actual": "厦门"
+        }
+      ]
+    },
+    {
+      "case_id": "addr_missing_detail_08",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是河南省郑州市金水区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市金水区",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市金水区",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "河南省郑州市金水区",
+            "provinceName": "河南省",
+            "cityName": "郑州市",
+            "districtName": "金水区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "河南省郑州市金水区",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市",
+        "sites[0].districtName": "金水区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "河南省郑州市金水区",
+        "sites[0].provinceName": "河南省",
+        "sites[0].cityName": "郑州市",
+        "sites[0].districtName": "金水区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.184,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "河南省郑州市金水区",
+          "actual": "河南省郑州市金水区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "河南省",
+          "actual": "河南省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "郑州市",
+          "actual": "郑州市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "金水区",
+          "actual": "金水区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_09",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是陕西省西安市雁塔区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市雁塔区",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市雁塔区",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "陕西省西安市雁塔区",
+            "provinceName": "陕西省",
+            "cityName": "西安市",
+            "districtName": "雁塔区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "陕西省西安市雁塔区",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市",
+        "sites[0].districtName": "雁塔区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "陕西省西安市雁塔区",
+        "sites[0].provinceName": "陕西省",
+        "sites[0].cityName": "西安市",
+        "sites[0].districtName": "雁塔区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.758,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "陕西省西安市雁塔区",
+          "actual": "陕西省西安市雁塔区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "陕西省",
+          "actual": "陕西省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "西安市",
+          "actual": "西安市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "雁塔区",
+          "actual": "雁塔区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "addr_missing_detail_10",
+      "scene": "missing_detail",
+      "tags": [
+        "missing_detail",
+        "address"
+      ],
+      "message": "经营地址是辽宁省沈阳市铁西区。",
+      "expected_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市铁西区",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "raw_predicted_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市铁西区",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "final_site_patch": {
+        "sites": [
+          {
+            "fullAddress": "辽宁省沈阳市铁西区",
+            "provinceName": "辽宁省",
+            "cityName": "沈阳市",
+            "districtName": "铁西区"
+          }
+        ]
+      },
+      "expected_flat": {
+        "sites[0].fullAddress": "辽宁省沈阳市铁西区",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市",
+        "sites[0].districtName": "铁西区"
+      },
+      "predicted_flat": {
+        "sites[0].fullAddress": "辽宁省沈阳市铁西区",
+        "sites[0].provinceName": "辽宁省",
+        "sites[0].cityName": "沈阳市",
+        "sites[0].districtName": "铁西区"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.561,
+      "attempt_count": 1,
+      "error": null,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "matches": [
+        {
+          "path": "sites[0].fullAddress",
+          "expected": "辽宁省沈阳市铁西区",
+          "actual": "辽宁省沈阳市铁西区"
+        },
+        {
+          "path": "sites[0].provinceName",
+          "expected": "辽宁省",
+          "actual": "辽宁省"
+        },
+        {
+          "path": "sites[0].cityName",
+          "expected": "沈阳市",
+          "actual": "沈阳市"
+        },
+        {
+          "path": "sites[0].districtName",
+          "expected": "铁西区",
+          "actual": "铁西区"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    }
+  ]
+}

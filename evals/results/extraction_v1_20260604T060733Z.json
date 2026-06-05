@@ -1,0 +1,871 @@
+{
+  "run_at": "2026-06-04T06:07:33.589499+00:00",
+  "case_file": "/workspace/evals/cases/extraction_v1.jsonl",
+  "model": "deepseek-v4-flash",
+  "metrics": {
+    "case_count": 12,
+    "exact_match_cases": 9,
+    "exact_match_rate": 0.75,
+    "field_precision": 0.9091,
+    "field_recall": 0.8571,
+    "field_f1": 0.8823,
+    "required_field_recall": 0.9231,
+    "average_latency_seconds": 2.966
+  },
+  "top_failure_paths": [
+    {
+      "path": "main_info.cooperationStatus",
+      "count": 2
+    },
+    {
+      "path": "main_info.expiryDate",
+      "count": 2
+    },
+    {
+      "path": "main_info.issueDate",
+      "count": 2
+    },
+    {
+      "path": "main_info.mainCategoryGrade",
+      "count": 1
+    },
+    {
+      "path": "main_info.source",
+      "count": 1
+    }
+  ],
+  "failures": [
+    {
+      "case_id": "ext_v1_004",
+      "tags": [
+        "normalization",
+        "date"
+      ],
+      "message": "签发日期是2026年6月1日，到期日期是 2027/12/31。",
+      "predicted_patch": {
+        "main_info": {
+          "issueDate": "2026年6月1日",
+          "expiryDate": "2027/12/31"
+        }
+      },
+      "false_positives": [
+        {
+          "path": "main_info.issueDate",
+          "expected": "2026-06-01",
+          "actual": "2026年6月1日"
+        },
+        {
+          "path": "main_info.expiryDate",
+          "expected": "2027-12-31",
+          "actual": "2027/12/31"
+        }
+      ],
+      "false_negatives": [
+        {
+          "path": "main_info.issueDate",
+          "expected": "2026-06-01",
+          "actual": "2026年6月1日"
+        },
+        {
+          "path": "main_info.expiryDate",
+          "expected": "2027-12-31",
+          "actual": "2027/12/31"
+        }
+      ]
+    },
+    {
+      "case_id": "ext_v1_006",
+      "tags": [
+        "semantic",
+        "required_like"
+      ],
+      "message": "他们主要做国产大牌汽配，合作状态是已经签了。",
+      "predicted_patch": {
+        "main_info": {
+          "mainCategory": "汽配",
+          "cooperationStatus": "signed"
+        }
+      },
+      "false_positives": [
+        {
+          "path": "main_info.cooperationStatus",
+          "expected": "稳定合作｜已签约",
+          "actual": "signed"
+        }
+      ],
+      "false_negatives": [
+        {
+          "path": "main_info.mainCategoryGrade",
+          "expected": "国内主流品牌为主",
+          "actual": null
+        },
+        {
+          "path": "main_info.cooperationStatus",
+          "expected": "稳定合作｜已签约",
+          "actual": "signed"
+        }
+      ]
+    },
+    {
+      "case_id": "ext_v1_011",
+      "tags": [
+        "semantic",
+        "main_info"
+      ],
+      "message": "所属区域华东，授权区域杭州和绍兴，来源老客户介绍，信息来源销售拜访。",
+      "predicted_patch": {
+        "main_info": {
+          "belongRegion": "华东",
+          "authorizedRegion": "杭州和绍兴",
+          "informationSource": "销售拜访"
+        }
+      },
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "path": "main_info.source",
+          "expected": "老客户介绍",
+          "actual": null
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "ext_v1_001",
+      "tags": [
+        "happy_path",
+        "main_info",
+        "required"
+      ],
+      "message": "经销商名称叫智行汽车，客户邮箱是 zhixing@example.com，客户手机号 13800138000，ERP 编码是 HZ001，主营品类是汽配，经营类型是批发B2B。",
+      "initial_patch": {},
+      "expected_patch": {
+        "main_info": {
+          "distributorName": "智行汽车",
+          "customerEmail": "zhixing@example.com",
+          "customerMobile": "13800138000",
+          "erpCode": "HZ001",
+          "mainCategory": "汽配",
+          "businessType": "批发B2B"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "distributorName": "智行汽车",
+          "customerEmail": "zhixing@example.com",
+          "customerMobile": "13800138000",
+          "erpCode": "HZ001",
+          "mainCategory": "汽配",
+          "businessType": "批发B2B"
+        }
+      },
+      "expected_flat": {
+        "main_info.distributorName": "智行汽车",
+        "main_info.customerEmail": "zhixing@example.com",
+        "main_info.customerMobile": "13800138000",
+        "main_info.erpCode": "HZ001",
+        "main_info.mainCategory": "汽配",
+        "main_info.businessType": "批发B2B"
+      },
+      "predicted_flat": {
+        "main_info.distributorName": "智行汽车",
+        "main_info.customerEmail": "zhixing@example.com",
+        "main_info.customerMobile": "13800138000",
+        "main_info.erpCode": "HZ001",
+        "main_info.mainCategory": "汽配",
+        "main_info.businessType": "批发B2B"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.751,
+      "match_count": 6,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 6,
+      "required_hit_count": 6,
+      "matches": [
+        {
+          "path": "main_info.distributorName",
+          "expected": "智行汽车",
+          "actual": "智行汽车"
+        },
+        {
+          "path": "main_info.customerEmail",
+          "expected": "zhixing@example.com",
+          "actual": "zhixing@example.com"
+        },
+        {
+          "path": "main_info.customerMobile",
+          "expected": "13800138000",
+          "actual": "13800138000"
+        },
+        {
+          "path": "main_info.erpCode",
+          "expected": "HZ001",
+          "actual": "HZ001"
+        },
+        {
+          "path": "main_info.mainCategory",
+          "expected": "汽配",
+          "actual": "汽配"
+        },
+        {
+          "path": "main_info.businessType",
+          "expected": "批发B2B",
+          "actual": "批发B2B"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_002",
+      "tags": [
+        "happy_path",
+        "contact",
+        "required"
+      ],
+      "message": "联系人王磊，职位老板，电话 13900001111，微信同手机号，是主联系人。",
+      "initial_patch": {},
+      "expected_patch": {
+        "contacts": [
+          {
+            "contactName": "王磊",
+            "position": "老板",
+            "mobile": "13900001111",
+            "wechat": "same_as_mobile",
+            "isPrimary": true
+          }
+        ]
+      },
+      "predicted_patch": {
+        "contacts": [
+          {
+            "contactName": "王磊",
+            "position": "老板",
+            "mobile": "13900001111",
+            "wechat": "same_as_mobile",
+            "isPrimary": true
+          }
+        ]
+      },
+      "expected_flat": {
+        "contacts[0].contactName": "王磊",
+        "contacts[0].position": "老板",
+        "contacts[0].mobile": "13900001111",
+        "contacts[0].wechat": "same_as_mobile",
+        "contacts[0].isPrimary": true
+      },
+      "predicted_flat": {
+        "contacts[0].contactName": "王磊",
+        "contacts[0].position": "老板",
+        "contacts[0].mobile": "13900001111",
+        "contacts[0].wechat": "same_as_mobile",
+        "contacts[0].isPrimary": true
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.211,
+      "match_count": 5,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 4,
+      "required_hit_count": 4,
+      "matches": [
+        {
+          "path": "contacts[0].contactName",
+          "expected": "王磊",
+          "actual": "王磊"
+        },
+        {
+          "path": "contacts[0].position",
+          "expected": "老板",
+          "actual": "老板"
+        },
+        {
+          "path": "contacts[0].mobile",
+          "expected": "13900001111",
+          "actual": "13900001111"
+        },
+        {
+          "path": "contacts[0].wechat",
+          "expected": "same_as_mobile",
+          "actual": "same_as_mobile"
+        },
+        {
+          "path": "contacts[0].isPrimary",
+          "expected": true,
+          "actual": true
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_003",
+      "tags": [
+        "normalization",
+        "pricing"
+      ],
+      "message": "状态正常，发积分，积分比例 1，给的是58折。",
+      "initial_patch": {},
+      "expected_patch": {
+        "main_info": {
+          "status": "normal",
+          "providePoints": true,
+          "providePointsRatio": 1.0,
+          "discount": 0.58
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "status": "normal",
+          "providePoints": true,
+          "providePointsRatio": 1,
+          "discount": 0.58
+        }
+      },
+      "expected_flat": {
+        "main_info.status": "normal",
+        "main_info.providePoints": true,
+        "main_info.providePointsRatio": 1.0,
+        "main_info.discount": 0.58
+      },
+      "predicted_flat": {
+        "main_info.status": "normal",
+        "main_info.providePoints": true,
+        "main_info.providePointsRatio": 1,
+        "main_info.discount": 0.58
+      },
+      "exact_match": true,
+      "elapsed_seconds": 3.515,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 3,
+      "required_hit_count": 3,
+      "matches": [
+        {
+          "path": "main_info.status",
+          "expected": "normal",
+          "actual": "normal"
+        },
+        {
+          "path": "main_info.providePoints",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "path": "main_info.providePointsRatio",
+          "expected": 1.0,
+          "actual": 1
+        },
+        {
+          "path": "main_info.discount",
+          "expected": 0.58,
+          "actual": 0.58
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_004",
+      "tags": [
+        "normalization",
+        "date"
+      ],
+      "message": "签发日期是2026年6月1日，到期日期是 2027/12/31。",
+      "initial_patch": {},
+      "expected_patch": {
+        "main_info": {
+          "issueDate": "2026-06-01",
+          "expiryDate": "2027-12-31"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "issueDate": "2026年6月1日",
+          "expiryDate": "2027/12/31"
+        }
+      },
+      "expected_flat": {
+        "main_info.issueDate": "2026-06-01",
+        "main_info.expiryDate": "2027-12-31"
+      },
+      "predicted_flat": {
+        "main_info.issueDate": "2026年6月1日",
+        "main_info.expiryDate": "2027/12/31"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 1.991,
+      "match_count": 0,
+      "false_positive_count": 2,
+      "false_negative_count": 2,
+      "required_expected_count": 0,
+      "required_hit_count": 0,
+      "matches": [],
+      "false_positives": [
+        {
+          "path": "main_info.issueDate",
+          "expected": "2026-06-01",
+          "actual": "2026年6月1日"
+        },
+        {
+          "path": "main_info.expiryDate",
+          "expected": "2027-12-31",
+          "actual": "2027/12/31"
+        }
+      ],
+      "false_negatives": [
+        {
+          "path": "main_info.issueDate",
+          "expected": "2026-06-01",
+          "actual": "2026年6月1日"
+        },
+        {
+          "path": "main_info.expiryDate",
+          "expected": "2027-12-31",
+          "actual": "2027/12/31"
+        }
+      ]
+    },
+    {
+      "case_id": "ext_v1_005",
+      "tags": [
+        "normalization",
+        "hierarchy"
+      ],
+      "message": "这是二级经销商，上级经销商是杭州汇诚工具。",
+      "initial_patch": {},
+      "expected_patch": {
+        "main_info": {
+          "distributorLevel": 2,
+          "parentDistributorName": "杭州汇诚工具"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "distributorLevel": 2,
+          "parentDistributorName": "杭州汇诚工具"
+        }
+      },
+      "expected_flat": {
+        "main_info.distributorLevel": 2,
+        "main_info.parentDistributorName": "杭州汇诚工具"
+      },
+      "predicted_flat": {
+        "main_info.distributorLevel": 2,
+        "main_info.parentDistributorName": "杭州汇诚工具"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 2.436,
+      "match_count": 2,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 1,
+      "required_hit_count": 1,
+      "matches": [
+        {
+          "path": "main_info.distributorLevel",
+          "expected": 2,
+          "actual": 2
+        },
+        {
+          "path": "main_info.parentDistributorName",
+          "expected": "杭州汇诚工具",
+          "actual": "杭州汇诚工具"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_006",
+      "tags": [
+        "semantic",
+        "required_like"
+      ],
+      "message": "他们主要做国产大牌汽配，合作状态是已经签了。",
+      "initial_patch": {},
+      "expected_patch": {
+        "main_info": {
+          "mainCategory": "汽配",
+          "mainCategoryGrade": "国内主流品牌为主",
+          "cooperationStatus": "稳定合作｜已签约"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "mainCategory": "汽配",
+          "cooperationStatus": "signed"
+        }
+      },
+      "expected_flat": {
+        "main_info.mainCategory": "汽配",
+        "main_info.mainCategoryGrade": "国内主流品牌为主",
+        "main_info.cooperationStatus": "稳定合作｜已签约"
+      },
+      "predicted_flat": {
+        "main_info.mainCategory": "汽配",
+        "main_info.cooperationStatus": "signed"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 3.322,
+      "match_count": 1,
+      "false_positive_count": 1,
+      "false_negative_count": 2,
+      "required_expected_count": 3,
+      "required_hit_count": 1,
+      "matches": [
+        {
+          "path": "main_info.mainCategory",
+          "expected": "汽配",
+          "actual": "汽配"
+        }
+      ],
+      "false_positives": [
+        {
+          "path": "main_info.cooperationStatus",
+          "expected": "稳定合作｜已签约",
+          "actual": "signed"
+        }
+      ],
+      "false_negatives": [
+        {
+          "path": "main_info.mainCategoryGrade",
+          "expected": "国内主流品牌为主",
+          "actual": null
+        },
+        {
+          "path": "main_info.cooperationStatus",
+          "expected": "稳定合作｜已签约",
+          "actual": "signed"
+        }
+      ]
+    },
+    {
+      "case_id": "ext_v1_007",
+      "tags": [
+        "modify",
+        "main_info"
+      ],
+      "message": "手机号改成 13900139000。",
+      "initial_patch": {
+        "main_info": {
+          "distributorName": "智行汽车",
+          "customerMobile": "13800138000"
+        }
+      },
+      "expected_patch": {
+        "main_info": {
+          "customerMobile": "13900139000"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "customerMobile": "13900139000"
+        }
+      },
+      "expected_flat": {
+        "main_info.customerMobile": "13900139000"
+      },
+      "predicted_flat": {
+        "main_info.customerMobile": "13900139000"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 1.282,
+      "match_count": 1,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 1,
+      "required_hit_count": 1,
+      "matches": [
+        {
+          "path": "main_info.customerMobile",
+          "expected": "13900139000",
+          "actual": "13900139000"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_008",
+      "tags": [
+        "modify",
+        "hierarchy"
+      ],
+      "message": "不是一级，改成二级，上级挂杭州汇诚工具。",
+      "initial_patch": {
+        "main_info": {
+          "distributorLevel": 1
+        }
+      },
+      "expected_patch": {
+        "main_info": {
+          "distributorLevel": 2,
+          "parentDistributorName": "杭州汇诚工具"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "distributorLevel": 2,
+          "parentDistributorName": "杭州汇诚工具"
+        }
+      },
+      "expected_flat": {
+        "main_info.distributorLevel": 2,
+        "main_info.parentDistributorName": "杭州汇诚工具"
+      },
+      "predicted_flat": {
+        "main_info.distributorLevel": 2,
+        "main_info.parentDistributorName": "杭州汇诚工具"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 1.753,
+      "match_count": 2,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 1,
+      "required_hit_count": 1,
+      "matches": [
+        {
+          "path": "main_info.distributorLevel",
+          "expected": 2,
+          "actual": 2
+        },
+        {
+          "path": "main_info.parentDistributorName",
+          "expected": "杭州汇诚工具",
+          "actual": "杭州汇诚工具"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_009",
+      "tags": [
+        "modify",
+        "contact"
+      ],
+      "message": "王磊微信改成 wl_tool。",
+      "initial_patch": {
+        "contacts": [
+          {
+            "contactName": "王磊",
+            "position": "老板",
+            "mobile": "13900001111"
+          }
+        ]
+      },
+      "expected_patch": {
+        "contacts": [
+          {
+            "contactName": "王磊",
+            "wechat": "wl_tool"
+          }
+        ]
+      },
+      "predicted_patch": {
+        "contacts": [
+          {
+            "contactName": "王磊",
+            "wechat": "wl_tool"
+          }
+        ]
+      },
+      "expected_flat": {
+        "contacts[0].contactName": "王磊",
+        "contacts[0].wechat": "wl_tool"
+      },
+      "predicted_flat": {
+        "contacts[0].contactName": "王磊",
+        "contacts[0].wechat": "wl_tool"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 4.882,
+      "match_count": 2,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 2,
+      "required_hit_count": 2,
+      "matches": [
+        {
+          "path": "contacts[0].contactName",
+          "expected": "王磊",
+          "actual": "王磊"
+        },
+        {
+          "path": "contacts[0].wechat",
+          "expected": "wl_tool",
+          "actual": "wl_tool"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_010",
+      "tags": [
+        "contact",
+        "required"
+      ],
+      "message": "采购刘芳，电话 13700002222，微信 lfcaigou。",
+      "initial_patch": {},
+      "expected_patch": {
+        "contacts": [
+          {
+            "contactName": "刘芳",
+            "position": "采购",
+            "mobile": "13700002222",
+            "wechat": "lfcaigou"
+          }
+        ]
+      },
+      "predicted_patch": {
+        "contacts": [
+          {
+            "contactName": "刘芳",
+            "position": "采购",
+            "mobile": "13700002222",
+            "wechat": "lfcaigou"
+          }
+        ]
+      },
+      "expected_flat": {
+        "contacts[0].contactName": "刘芳",
+        "contacts[0].position": "采购",
+        "contacts[0].mobile": "13700002222",
+        "contacts[0].wechat": "lfcaigou"
+      },
+      "predicted_flat": {
+        "contacts[0].contactName": "刘芳",
+        "contacts[0].position": "采购",
+        "contacts[0].mobile": "13700002222",
+        "contacts[0].wechat": "lfcaigou"
+      },
+      "exact_match": true,
+      "elapsed_seconds": 1.841,
+      "match_count": 4,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 4,
+      "required_hit_count": 4,
+      "matches": [
+        {
+          "path": "contacts[0].contactName",
+          "expected": "刘芳",
+          "actual": "刘芳"
+        },
+        {
+          "path": "contacts[0].position",
+          "expected": "采购",
+          "actual": "采购"
+        },
+        {
+          "path": "contacts[0].mobile",
+          "expected": "13700002222",
+          "actual": "13700002222"
+        },
+        {
+          "path": "contacts[0].wechat",
+          "expected": "lfcaigou",
+          "actual": "lfcaigou"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": []
+    },
+    {
+      "case_id": "ext_v1_011",
+      "tags": [
+        "semantic",
+        "main_info"
+      ],
+      "message": "所属区域华东，授权区域杭州和绍兴，来源老客户介绍，信息来源销售拜访。",
+      "initial_patch": {},
+      "expected_patch": {
+        "main_info": {
+          "belongRegion": "华东",
+          "authorizedRegion": "杭州和绍兴",
+          "source": "老客户介绍",
+          "informationSource": "销售拜访"
+        }
+      },
+      "predicted_patch": {
+        "main_info": {
+          "belongRegion": "华东",
+          "authorizedRegion": "杭州和绍兴",
+          "informationSource": "销售拜访"
+        }
+      },
+      "expected_flat": {
+        "main_info.belongRegion": "华东",
+        "main_info.authorizedRegion": "杭州和绍兴",
+        "main_info.source": "老客户介绍",
+        "main_info.informationSource": "销售拜访"
+      },
+      "predicted_flat": {
+        "main_info.belongRegion": "华东",
+        "main_info.authorizedRegion": "杭州和绍兴",
+        "main_info.informationSource": "销售拜访"
+      },
+      "exact_match": false,
+      "elapsed_seconds": 8.568,
+      "match_count": 3,
+      "false_positive_count": 0,
+      "false_negative_count": 1,
+      "required_expected_count": 1,
+      "required_hit_count": 1,
+      "matches": [
+        {
+          "path": "main_info.belongRegion",
+          "expected": "华东",
+          "actual": "华东"
+        },
+        {
+          "path": "main_info.authorizedRegion",
+          "expected": "杭州和绍兴",
+          "actual": "杭州和绍兴"
+        },
+        {
+          "path": "main_info.informationSource",
+          "expected": "销售拜访",
+          "actual": "销售拜访"
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "path": "main_info.source",
+          "expected": "老客户介绍",
+          "actual": null
+        }
+      ]
+    },
+    {
+      "case_id": "ext_v1_012",
+      "tags": [
+        "negative",
+        "empty"
+      ],
+      "message": "你好，今天天气怎么样？",
+      "initial_patch": {},
+      "expected_patch": {},
+      "predicted_patch": {},
+      "expected_flat": {},
+      "predicted_flat": {},
+      "exact_match": true,
+      "elapsed_seconds": 1.039,
+      "match_count": 0,
+      "false_positive_count": 0,
+      "false_negative_count": 0,
+      "required_expected_count": 0,
+      "required_hit_count": 0,
+      "matches": [],
+      "false_positives": [],
+      "false_negatives": []
+    }
+  ]
+}

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>经销商 Agent 联调页</title>
+    <style>
+      :root {
+        --bg: #f5f1e8;
+        --panel: #fffdf8;
+        --ink: #1d2a36;
+        --muted: #66727d;
+        --line: #ddd4c4;
+        --accent: #b8562a;
+        --accent-soft: #f3e1d7;
+        --user: #1d2a36;
+        --agent: #ffffff;
+        --shadow: 0 18px 40px rgba(29, 42, 54, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(184, 86, 42, 0.12), transparent 28%),
+          linear-gradient(180deg, #f7f3ea 0%, var(--bg) 100%);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+      }
+
+      .page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 18px 32px;
+      }
+
+      .shell {
+        background: rgba(255, 253, 248, 0.92);
+        border: 1px solid rgba(221, 212, 196, 0.9);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        backdrop-filter: blur(12px);
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 22px 24px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .title {
+        margin: 0;
+        font-size: 26px;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .session-pill {
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: #f1ebdf;
+        color: var(--ink);
+        font-size: 12px;
+        max-width: 240px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .button {
+        border: 0;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 120ms ease, opacity 120ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .button-secondary {
+        background: #e7dfd0;
+        color: var(--ink);
+      }
+
+      .button-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        min-height: 620px;
+      }
+
+      .chat-panel {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        border-right: 1px solid var(--line);
+      }
+
+      .messages {
+        flex: 1;
+        padding: 22px;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0)),
+          transparent;
+      }
+
+      .message {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-width: 85%;
+      }
+
+      .message-user {
+        align-self: flex-end;
+      }
+
+      .message-agent,
+      .message-system {
+        align-self: flex-start;
+      }
+
+      .message-label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .message-bubble {
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .message-user .message-bubble {
+        background: var(--user);
+        color: #fff;
+        border-bottom-right-radius: 6px;
+      }
+
+      .message-agent .message-bubble {
+        background: var(--agent);
+        border: 1px solid #e7dfd0;
+        border-bottom-left-radius: 6px;
+      }
+
+      .message-system .message-bubble {
+        background: var(--accent-soft);
+        color: #6e3a20;
+        border-bottom-left-radius: 6px;
+      }
+
+      .composer {
+        padding: 18px 22px 22px;
+        border-top: 1px solid var(--line);
+        background: rgba(255, 253, 248, 0.96);
+      }
+
+      .quick-fill {
+        margin-bottom: 14px;
+        padding: 14px;
+        border: 1px solid #e7dfd0;
+        border-radius: 18px;
+        background: #fffaf3;
+      }
+
+      .quick-fill[hidden] {
+        display: none;
+      }
+
+      .quick-fill-title {
+        margin: 0 0 8px;
+        font-size: 13px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .quick-fill-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .quick-fill-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .quick-fill-label {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .quick-fill select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        color: var(--ink);
+        background: #fff;
+        outline: none;
+      }
+
+      .quick-fill-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+
+      .voice-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 12px 14px;
+        border: 1px solid #e7dfd0;
+        border-radius: 16px;
+        background: #fffaf3;
+      }
+
+      .voice-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .voice-status {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .composer-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+      }
+
+      .composer textarea {
+        flex: 1;
+        min-height: 96px;
+        resize: vertical;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px 16px;
+        font: inherit;
+        color: var(--ink);
+        background: #fff;
+        outline: none;
+      }
+
+      .composer textarea:focus {
+        border-color: rgba(184, 86, 42, 0.45);
+        box-shadow: 0 0 0 4px rgba(184, 86, 42, 0.08);
+      }
+
+      .composer textarea[readonly] {
+        background: #f7f3ea;
+      }
+
+      .helper {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .side-panel {
+        padding: 22px 20px;
+        background: rgba(249, 245, 236, 0.8);
+      }
+
+      .card {
+        padding: 16px;
+        border-radius: 18px;
+        background: #fffdf8;
+        border: 1px solid #e7dfd0;
+      }
+
+      .card + .card {
+        margin-top: 14px;
+      }
+
+      .card-title {
+        margin: 0 0 10px;
+        font-size: 13px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .metric {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .status-list,
+      .created-result {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .status-empty {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 840px) {
+        .body {
+          grid-template-columns: 1fr;
+        }
+
+        .chat-panel {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .controls {
+          justify-content: space-between;
+          flex-wrap: wrap;
+        }
+
+        .message {
+          max-width: 100%;
+        }
+
+        .quick-fill-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="shell">
+        <div class="header">
+          <div>
+            <h1 class="title">经销商 Agent 联调页</h1>
+            <p class="subtitle">单页聊天框，直接调用当前 FastAPI chat 接口做端到端联调。</p>
+          </div>
+          <div class="controls">
+            <div class="session-pill" id="sessionPill"></div>
+            <button class="button button-secondary" id="newSessionButton" type="button">新建会话</button>
+          </div>
+        </div>
+
+        <div class="body">
+          <section class="chat-panel">
+            <div class="messages" id="messages"></div>
+            <div class="composer">
+              <div class="quick-fill" id="quickFillPanel" hidden>
+                <p class="quick-fill-title">快捷补充（标准值）</p>
+                <div class="quick-fill-grid" id="quickFillGrid"></div>
+                <div class="quick-fill-actions">
+                  <button class="button button-secondary" id="quickFillButton" type="button">提交选择</button>
+                </div>
+              </div>
+              <div class="voice-toolbar">
+                <div class="voice-actions">
+                  <button class="button button-secondary" id="startRecordingButton" type="button">开始录音</button>
+                  <button class="button button-secondary" id="stopRecordingButton" type="button" disabled>停止录音</button>
+                </div>
+                <div class="voice-status" id="voiceStatus">语音未启动</div>
+              </div>
+              <div class="composer-row">
+                <textarea
+                  id="messageInput"
+                  placeholder="例如：新增一个二级经销商，名称叫智行汽车，ERP编码是HZ001，客户邮箱是zhixing@example.com。"
+                ></textarea>
+                <button class="button button-primary" id="sendButton" type="button">发送</button>
+              </div>
+              <div class="helper">语音会实时转写到输入框，销售确认后再发送。按 Enter 发送，Shift + Enter 换行。</div>
+            </div>
+          </section>
+
+          <aside class="side-panel">
+            <div class="card">
+              <h2 class="card-title">当前阶段</h2>
+              <div class="metric" id="stageMetric">collecting</div>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">缺失字段</h2>
+              <ul class="status-list" id="missingFieldsList"></ul>
+              <p class="status-empty" id="missingFieldsEmpty" hidden>当前没有缺失字段。</p>
+            </div>
+
+            <div class="card">
+              <h2 class="card-title">创建结果</h2>
+              <ul class="created-result" id="createdResultList"></ul>
+              <p class="status-empty" id="createdResultEmpty">当前还没有创建结果。</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sessionPill = document.getElementById("sessionPill");
+      const messages = document.getElementById("messages");
+      const messageInput = document.getElementById("messageInput");
+      const sendButton = document.getElementById("sendButton");
+      const newSessionButton = document.getElementById("newSessionButton");
+      const quickFillPanel = document.getElementById("quickFillPanel");
+      const quickFillGrid = document.getElementById("quickFillGrid");
+      const quickFillButton = document.getElementById("quickFillButton");
+      const startRecordingButton = document.getElementById("startRecordingButton");
+      const stopRecordingButton = document.getElementById("stopRecordingButton");
+      const voiceStatus = document.getElementById("voiceStatus");
+      const stageMetric = document.getElementById("stageMetric");
+      const missingFieldsList = document.getElementById("missingFieldsList");
+      const missingFieldsEmpty = document.getElementById("missingFieldsEmpty");
+      const createdResultList = document.getElementById("createdResultList");
+      const createdResultEmpty = document.getElementById("createdResultEmpty");
+
+      let sessionId = "";
+      let sending = false;
+      let currentMissingFields = [];
+      let fieldOptions = {};
+      let quickFillDraft = {};
+      let recording = false;
+      let awaitingAsrFinish = false;
+      let asrSocket = null;
+      let asrStream = null;
+      let asrAudioContext = null;
+      let asrSourceNode = null;
+      let asrProcessorNode = null;
+      let asrInputPrefix = "";
+      let asrTranscript = "";
+      let asrPreview = "";
+
+      function createSessionId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+          return `web-${window.crypto.randomUUID()}`;
+        }
+        return `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function resetSession() {
+        sessionId = createSessionId();
+        sessionPill.textContent = `会话: ${sessionId}`;
+        messages.innerHTML = "";
+        stageMetric.textContent = "collecting";
+        renderMissingFields([]);
+        renderCreatedResult(null);
+        renderQuickFill([]);
+        quickFillDraft = {};
+        appendMessage(
+          "system",
+          `已新建会话。\n你现在可以直接输入自然语言，也可以在下方枚举面板里补充标准字段。`
+        );
+        messageInput.value = "";
+        asrInputPrefix = "";
+        asrTranscript = "";
+        asrPreview = "";
+        setVoiceStatus("语音未启动");
+        messageInput.focus();
+      }
+
+      function appendMessage(role, text) {
+        const wrapper = document.createElement("div");
+        wrapper.className = `message message-${role}`;
+
+        const label = document.createElement("div");
+        label.className = "message-label";
+        label.textContent = role === "user" ? "你" : role === "agent" ? "Agent" : "系统";
+
+        const bubble = document.createElement("div");
+        bubble.className = "message-bubble";
+        bubble.textContent = text;
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        messages.appendChild(wrapper);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function renderMissingFields(fields) {
+        currentMissingFields = fields || [];
+        missingFieldsList.innerHTML = "";
+        if (!currentMissingFields || currentMissingFields.length === 0) {
+          missingFieldsEmpty.hidden = false;
+          renderQuickFill([]);
+          return;
+        }
+
+        missingFieldsEmpty.hidden = true;
+        currentMissingFields.forEach((field) => {
+          const item = document.createElement("li");
+          item.textContent = field;
+          missingFieldsList.appendChild(item);
+        });
+        renderQuickFill(currentMissingFields);
+      }
+
+      function renderCreatedResult(createdResult) {
+        createdResultList.innerHTML = "";
+        if (!createdResult) {
+          createdResultEmpty.hidden = false;
+          return;
+        }
+
+        createdResultEmpty.hidden = true;
+        Object.entries(createdResult).forEach(([key, value]) => {
+          const item = document.createElement("li");
+          item.textContent = `${key}: ${String(value)}`;
+          createdResultList.appendChild(item);
+        });
+      }
+
+      function renderQuickFill(fields) {
+        quickFillGrid.innerHTML = "";
+
+        const structuredFields = (fields || []).filter((field) => fieldOptions[field]);
+        quickFillPanel.hidden = structuredFields.length === 0;
+
+        Object.keys(quickFillDraft).forEach((fieldPath) => {
+          if (!structuredFields.includes(fieldPath)) {
+            delete quickFillDraft[fieldPath];
+          }
+        });
+
+        structuredFields.forEach((fieldPath) => {
+          const config = fieldOptions[fieldPath];
+          const fieldWrapper = document.createElement("div");
+          fieldWrapper.className = "quick-fill-field";
+
+          const label = document.createElement("label");
+          label.className = "quick-fill-label";
+          label.setAttribute("for", buildFieldElementId(fieldPath));
+          label.textContent = config.label;
+
+          const select = document.createElement("select");
+          select.id = buildFieldElementId(fieldPath);
+
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = `请选择${config.label}`;
+          select.appendChild(placeholder);
+
+          config.options.forEach((option) => {
+            const element = document.createElement("option");
+            element.value = JSON.stringify(option.value);
+            element.textContent = option.label;
+            select.appendChild(element);
+          });
+
+          if (Object.prototype.hasOwnProperty.call(quickFillDraft, fieldPath)) {
+            select.value = JSON.stringify(quickFillDraft[fieldPath]);
+          }
+
+          select.addEventListener("change", (event) => {
+            const selectedValue = event.target.value;
+            if (!selectedValue) {
+              delete quickFillDraft[fieldPath];
+              return;
+            }
+            quickFillDraft[fieldPath] = JSON.parse(selectedValue);
+          });
+
+          fieldWrapper.appendChild(label);
+          fieldWrapper.appendChild(select);
+          quickFillGrid.appendChild(fieldWrapper);
+        });
+      }
+
+      function buildFieldElementId(fieldPath) {
+        return `quickFill-${fieldPath.replace(/[^a-zA-Z0-9]+/g, "-")}`;
+      }
+
+      function buildStructuredPatch() {
+        const patch = {};
+        Object.entries(quickFillDraft).forEach(([fieldPath, value]) => {
+          setPathValue(patch, fieldPath, value);
+        });
+        return patch;
+      }
+
+      function setPathValue(target, fieldPath, value) {
+        const [section, fieldName] = fieldPath.split(".", 2);
+        if (!section || !fieldName) {
+          return;
+        }
+        if (!target[section]) {
+          target[section] = {};
+        }
+        target[section][fieldName] = value;
+      }
+
+      function buildStructuredPreview(patch) {
+        const segments = [];
+        Object.entries(patch.main_info || {}).forEach(([fieldName, value]) => {
+          const fieldPath = `main_info.${fieldName}`;
+          const config = fieldOptions[fieldPath];
+          if (!config) {
+            return;
+          }
+          const selectedOption = config.options.find((option) => option.value === value);
+          const displayValue = selectedOption ? selectedOption.label : String(value);
+          segments.push(`${config.label}=${displayValue}`);
+        });
+        return segments.join("，");
+      }
+
+      function updateControls() {
+        const busy = sending || recording || awaitingAsrFinish;
+        sendButton.disabled = busy;
+        quickFillButton.disabled = busy;
+        newSessionButton.disabled = busy;
+        startRecordingButton.disabled = busy;
+        stopRecordingButton.disabled = !recording || awaitingAsrFinish;
+        messageInput.readOnly = recording || awaitingAsrFinish;
+      }
+
+      function setSending(nextSending) {
+        sending = nextSending;
+        updateControls();
+      }
+
+      function setVoiceStatus(text) {
+        voiceStatus.textContent = text;
+      }
+
+      function buildAsrWebSocketUrl() {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        return `${protocol}//${window.location.host}/api/agent/distributors/asr/realtime`;
+      }
+
+      function composeAsrDraft() {
+        const transcriptBlock = `${asrTranscript}${asrPreview}`.trim();
+        if (!asrInputPrefix) {
+          return transcriptBlock;
+        }
+        if (!transcriptBlock) {
+          return asrInputPrefix;
+        }
+        return `${asrInputPrefix}\n${transcriptBlock}`;
+      }
+
+      function refreshAsrDraft() {
+        messageInput.value = composeAsrDraft();
+      }
+
+      function cleanupRecordingResources() {
+        if (asrProcessorNode) {
+          asrProcessorNode.disconnect();
+          asrProcessorNode.onaudioprocess = null;
+          asrProcessorNode = null;
+        }
+        if (asrSourceNode) {
+          asrSourceNode.disconnect();
+          asrSourceNode = null;
+        }
+        if (asrStream) {
+          asrStream.getTracks().forEach((track) => track.stop());
+          asrStream = null;
+        }
+        if (asrAudioContext) {
+          asrAudioContext.close();
+          asrAudioContext = null;
+        }
+      }
+
+      function finishRecording(statusText) {
+        cleanupRecordingResources();
+        recording = false;
+        awaitingAsrFinish = false;
+        asrSocket = null;
+        updateControls();
+        setVoiceStatus(statusText);
+      }
+
+      async function startMicrophoneStreaming() {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        asrAudioContext = new AudioContextClass();
+        await asrAudioContext.resume();
+        asrSourceNode = asrAudioContext.createMediaStreamSource(asrStream);
+        asrProcessorNode = asrAudioContext.createScriptProcessor(4096, 1, 1);
+        asrProcessorNode.onaudioprocess = (event) => {
+          if (!asrSocket || asrSocket.readyState !== WebSocket.OPEN || awaitingAsrFinish) {
+            return;
+          }
+          const channelData = event.inputBuffer.getChannelData(0);
+          const pcmBuffer = downsampleTo16kHz(channelData, asrAudioContext.sampleRate);
+          if (pcmBuffer.byteLength > 0) {
+            asrSocket.send(pcmBuffer);
+          }
+        };
+        asrSourceNode.connect(asrProcessorNode);
+        asrProcessorNode.connect(asrAudioContext.destination);
+      }
+
+      function downsampleTo16kHz(buffer, inputSampleRate) {
+        if (!buffer || buffer.length === 0) {
+          return new ArrayBuffer(0);
+        }
+
+        const targetSampleRate = 16000;
+        if (inputSampleRate === targetSampleRate) {
+          return float32ToPcm16(buffer).buffer;
+        }
+
+        const ratio = inputSampleRate / targetSampleRate;
+        const resultLength = Math.round(buffer.length / ratio);
+        const result = new Int16Array(resultLength);
+        let offsetResult = 0;
+        let offsetBuffer = 0;
+
+        while (offsetResult < result.length) {
+          const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+          let sum = 0;
+          let count = 0;
+          for (let index = offsetBuffer; index < nextOffsetBuffer && index < buffer.length; index += 1) {
+            sum += buffer[index];
+            count += 1;
+          }
+          const sample = count > 0 ? sum / count : 0;
+          const clamped = Math.max(-1, Math.min(1, sample));
+          result[offsetResult] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
+          offsetResult += 1;
+          offsetBuffer = nextOffsetBuffer;
+        }
+
+        return result.buffer;
+      }
+
+      function float32ToPcm16(buffer) {
+        const result = new Int16Array(buffer.length);
+        for (let index = 0; index < buffer.length; index += 1) {
+          const sample = Math.max(-1, Math.min(1, buffer[index]));
+          result[index] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+        }
+        return result;
+      }
+
+      async function startRecording() {
+        if (sending || recording || awaitingAsrFinish) {
+          return;
+        }
+
+        try {
+          setVoiceStatus("正在请求麦克风权限...");
+          asrStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              channelCount: 1,
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            },
+          });
+        } catch (error) {
+          setVoiceStatus("麦克风权限失败");
+          appendMessage("system", `无法开始录音：${error.message}`);
+          return;
+        }
+
+        asrInputPrefix = messageInput.value.trim();
+        asrTranscript = "";
+        asrPreview = "";
+        recording = true;
+        awaitingAsrFinish = false;
+        updateControls();
+        setVoiceStatus("正在连接实时语音识别...");
+
+        asrSocket = new WebSocket(buildAsrWebSocketUrl());
+        asrSocket.binaryType = "arraybuffer";
+
+        asrSocket.addEventListener("open", () => {
+          asrSocket.send(JSON.stringify({ type: "start" }));
+        });
+
+        asrSocket.addEventListener("message", async (event) => {
+          const payload = JSON.parse(event.data);
+          if (payload.type === "starting") {
+            setVoiceStatus("语音识别会话初始化中...");
+            return;
+          }
+          if (payload.type === "ready") {
+            setVoiceStatus("录音中，文字将实时回填输入框");
+            await startMicrophoneStreaming();
+            return;
+          }
+          if (payload.type === "partial") {
+            asrTranscript = payload.text || "";
+            asrPreview = payload.stash || "";
+            refreshAsrDraft();
+            return;
+          }
+          if (payload.type === "final") {
+            asrTranscript = payload.text || "";
+            asrPreview = "";
+            refreshAsrDraft();
+            return;
+          }
+          if (payload.type === "finished") {
+            finishRecording("识别完成，请检查后发送");
+            return;
+          }
+          if (payload.type === "error") {
+            appendMessage("system", `语音识别失败：${payload.message || "未知错误"}`);
+            finishRecording("语音识别失败");
+          }
+        });
+
+        asrSocket.addEventListener("close", () => {
+          if (recording || awaitingAsrFinish) {
+            finishRecording("语音会话已关闭");
+          }
+        });
+
+        asrSocket.addEventListener("error", () => {
+          appendMessage("system", "实时语音识别连接异常。");
+          finishRecording("语音识别连接异常");
+        });
+      }
+
+      function stopRecording() {
+        if (!recording || awaitingAsrFinish || !asrSocket || asrSocket.readyState !== WebSocket.OPEN) {
+          return;
+        }
+
+        awaitingAsrFinish = true;
+        cleanupRecordingResources();
+        updateControls();
+        setVoiceStatus("正在结束录音并等待最终文本...");
+        asrSocket.send(JSON.stringify({ type: "stop" }));
+      }
+
+      async function sendMessage(rawText) {
+        const text = (rawText ?? messageInput.value).trim();
+        if (!text || sending || recording || awaitingAsrFinish) {
+          return;
+        }
+
+        setSending(true);
+
+        appendMessage("user", text);
+        if (rawText === undefined) {
+          messageInput.value = "";
+        }
+
+        try {
+          const response = await fetch("/api/agent/distributors/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              message: text,
+            }),
+          });
+
+          if (!response.ok) {
+            const fallbackText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
+          }
+
+          const payload = await response.json();
+          appendMessage("agent", payload.reply || "接口返回为空");
+          stageMetric.textContent = payload.stage || "unknown";
+          renderMissingFields(payload.missing_required_fields || []);
+          renderCreatedResult(payload.created_result || null);
+        } catch (error) {
+          appendMessage("system", `请求失败：${error.message}`);
+        } finally {
+          setSending(false);
+          messageInput.focus();
+        }
+      }
+
+      async function sendStructuredFields() {
+        if (sending || recording || awaitingAsrFinish) {
+          return;
+        }
+
+        const patch = buildStructuredPatch();
+        if (!patch.main_info || Object.keys(patch.main_info).length === 0) {
+          appendMessage("system", "请先选择至少一个标准字段。");
+          return;
+        }
+
+        setSending(true);
+        appendMessage("user", `结构化补充：${buildStructuredPreview(patch)}`);
+
+        try {
+          const response = await fetch("/api/agent/distributors/fields", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              patch,
+            }),
+          });
+
+          if (!response.ok) {
+            const fallbackText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
+          }
+
+          const payload = await response.json();
+          quickFillDraft = {};
+          appendMessage("agent", payload.reply || "接口返回为空");
+          stageMetric.textContent = payload.stage || "unknown";
+          renderMissingFields(payload.missing_required_fields || []);
+          renderCreatedResult(payload.created_result || null);
+        } catch (error) {
+          appendMessage("system", `请求失败：${error.message}`);
+        } finally {
+          setSending(false);
+          messageInput.focus();
+        }
+      }
+
+      async function loadFieldOptions() {
+        try {
+          const response = await fetch("/api/agent/distributors/field-options");
+          if (!response.ok) {
+            const fallbackText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
+          }
+          const payload = await response.json();
+          fieldOptions = payload.fields || {};
+          renderQuickFill(currentMissingFields);
+        } catch (error) {
+          appendMessage("system", `枚举字段加载失败：${error.message}`);
+        }
+      }
+
+      sendButton.addEventListener("click", sendMessage);
+      quickFillButton.addEventListener("click", sendStructuredFields);
+      startRecordingButton.addEventListener("click", startRecording);
+      stopRecordingButton.addEventListener("click", stopRecording);
+      newSessionButton.addEventListener("click", resetSession);
+      messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+
+      resetSession();
+      updateControls();
+      loadFieldOptions();
+    </script>
+  </body>
+</html>
