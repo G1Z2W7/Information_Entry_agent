@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8010 --reload
+    env_file:
+      - ../../.env
+    environment:
+      ALL_PROXY: ""
+      HTTP_PROXY: ""
+      HTTPS_PROXY: ""
+    volumes:
+      - .:/workspace
+    ports:
+      - "8010:8010"
