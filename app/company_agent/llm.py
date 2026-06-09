@@ -4,7 +4,7 @@ import json
 import os
 from typing import Any
 
-from openai import OpenAI
+from langchain_openai import ChatOpenAI
 
 from app.company_agent.models import CompanyCandidate
 from app.company_agent.prompts import (
@@ -14,22 +14,49 @@ from app.company_agent.prompts import (
 )
 
 
-def _build_llm_client() -> OpenAI:
-    api_key = os.getenv("DEEPSEEK_API_KEY", "")
-    base_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+def _build_deepseek_client() -> ChatOpenAI:
+    api_key = os.getenv("DS_API_KEY")
+    base_url = os.getenv("DS_BASE_URL", "https://api.deepseek.com")
+    model = os.getenv("DS_MODEL", "deepseek-chat")
     if not api_key:
-        raise RuntimeError("DEEPSEEK_API_KEY is not configured")
-    return OpenAI(api_key=api_key, base_url=base_url)
+        raise RuntimeError("DS_API_KEY is not configured")
+    return ChatOpenAI(
+        model=model,
+        api_key=api_key,
+        base_url=base_url,
+        temperature=0.0,
+        timeout=60,
+        max_retries=0,
+    )
+
+
+def _build_zhipu_web_client() -> ChatOpenAI:
+    api_key = os.getenv("ZP_API_KEY")
+    base_url = os.getenv("ZP_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
+    model = os.getenv("ZP_MODEL", "GLM-4.7-Flash")
+    if not api_key:
+        raise RuntimeError("ZP_API_KEY is not configured")
+    return ChatOpenAI(
+        model=model,
+        api_key=api_key,
+        base_url=base_url,
+        temperature=0.0,
+        timeout=60,
+        max_retries=0,
+    )
 
 
 def _parse_llm_json(response: Any) -> dict[str, Any]:
-    content = response.choices[0].message.content
+    content = response.content if hasattr(response, "content") else ""
     if isinstance(content, str):
         content = content.strip()
         if content.startswith("```"):
             lines = content.split("\n")
             content = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
-        return json.loads(content)
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            return {}
     return {}
 
 
@@ -37,34 +64,26 @@ def cross_validate_with_web_search(
     user_input: str,
     qixin_candidates: list[CompanyCandidate],
 ) -> dict[str, Any]:
-    client = _build_llm_client()
+    client = _build_zhipu_web_client()
     qixin_text = "\n".join(
         f"- {c.company_name}" for c in qixin_candidates
     )
-    response = client.chat.completions.create(
-        model="deepseek-chat",
-        messages=[
-            {"role": "system", "content": CROSS_VALIDATE_SYSTEM_PROMPT},
-            {"role": "user", "content": CROSS_VALIDATE_USER_PROMPT.format(
-                user_input=user_input,
-                qixin_candidates=qixin_text,
-            )},
-        ],
-        temperature=0.1,
-    )
+    response = client.invoke([
+        {"role": "system", "content": CROSS_VALIDATE_SYSTEM_PROMPT},
+        {"role": "user", "content": CROSS_VALIDATE_USER_PROMPT.format(
+            user_input=user_input,
+            qixin_candidates=qixin_text,
+        )},
+    ])
     return _parse_llm_json(response)
 
 
 def web_search_candidates(user_input: str) -> dict[str, Any]:
-    client = _build_llm_client()
-    response = client.chat.completions.create(
-        model="deepseek-chat",
-        messages=[
-            {"role": "system", "content": WEB_SEARCH_PROMPT},
-            {"role": "user", "content": f'请搜索"{user_input}"并返回可能的匹配公司'},
-        ],
-        temperature=0.1,
-    )
+    client = _build_zhipu_web_client()
+    response = client.invoke([
+        {"role": "system", "content": WEB_SEARCH_PROMPT},
+        {"role": "user", "content": f'请搜索"{user_input}"并返回可能的匹配公司'},
+    ])
     return _parse_llm_json(response)
 
 
