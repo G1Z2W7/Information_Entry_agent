@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
 from app.api.chat import router as chat_router
+from app.api.company_agent import router as company_agent_router
 from app.api.location_agent import router as location_agent_router
 from app.api.qixin import router as qixin_router
 
@@ -33,5 +34,6 @@ def location_agent_playground() -> FileResponse:
 
 
 app.include_router(chat_router)
+app.include_router(company_agent_router)
 app.include_router(location_agent_router)
 app.include_router(qixin_router)
