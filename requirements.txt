@@ -22,6 +22,7 @@ sqlalchemy
 aiomysql
 alembic
 httpx
+socksio
 tenacity
 orjson
 pytest
