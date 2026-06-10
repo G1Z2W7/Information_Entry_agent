@@ -6,7 +6,12 @@ from app.agent.models import (
     AddressResolutionResponse,
     ChatRequest,
     ChatResponse,
+    CompanyCommitRequest,
+    CompanyFlowSyncRequest,
+    CompanySearchRequest,
     FieldOptionsResponse,
+    LocationCommitRequest,
+    LocationFlowSyncRequest,
     StructuredPatchRequest,
 )
 from app.agent.service import AgentService
@@ -70,3 +75,49 @@ def patch_fields(
     service: AgentService = Depends(get_agent_service),
 ) -> ChatResponse:
     return service.process_structured_patch(request.session_id, request.patch)
+
+
+@router.post("/company/search", response_model=ChatResponse)
+def search_company_candidates(
+    request: CompanySearchRequest,
+    service: AgentService = Depends(get_agent_service),
+) -> ChatResponse:
+    return service.search_company_candidates(request)
+
+
+@router.post("/company/sync", response_model=ChatResponse)
+def sync_company_flow(
+    request: CompanyFlowSyncRequest,
+    service: AgentService = Depends(get_agent_service),
+) -> ChatResponse:
+    return service.sync_company_flow(request)
+
+
+@router.post("/company/commit", response_model=ChatResponse)
+def commit_company_flow(
+    request: CompanyCommitRequest,
+    service: AgentService = Depends(get_agent_service),
+) -> ChatResponse:
+    try:
+        return service.commit_company_flow(request)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@router.post("/location/sync", response_model=ChatResponse)
+def sync_location_flow(
+    request: LocationFlowSyncRequest,
+    service: AgentService = Depends(get_agent_service),
+) -> ChatResponse:
+    return service.sync_location_flow(request)
+
+
+@router.post("/location/commit", response_model=ChatResponse)
+def commit_location_flow(
+    request: LocationCommitRequest,
+    service: AgentService = Depends(get_agent_service),
+) -> ChatResponse:
+    try:
+        return service.commit_location_flow(request)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc

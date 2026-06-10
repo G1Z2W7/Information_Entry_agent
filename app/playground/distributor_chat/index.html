@@ -26,12 +26,42 @@ body {
   margin: 0;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background:
     radial-gradient(circle at top right, rgba(36,107,255,0.08), transparent 24%),
     linear-gradient(180deg, #eff4ff 0%, var(--bg) 38%, #f7f9fc 100%);
   color: var(--ink);
   font-family: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+  padding: 20px;
+}
+
+/* ===== Phone Shell ===== */
+.phone-shell {
+  width: 390px;
+  max-width: 100vw;
+  height: min(844px, calc(100vh - 40px));
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 40px;
+  border: 3px solid #1d2a36;
+  box-shadow:
+    0 0 0 2px #e0e0e0,
+    0 20px 60px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+}
+/* notch */
+.phone-shell::before {
+  content: "";
+  display: block;
+  width: 120px;
+  height: 30px;
+  background: #1d2a36;
+  border-radius: 0 0 20px 20px;
+  margin: 0 auto;
+  flex-shrink: 0;
 }
 
 /* ===== Welcome Hero ===== */
@@ -231,11 +261,14 @@ body {
   padding: 8px 14px; background: #f7f9fc;
   border: 1px solid var(--line); border-radius: 24px;
 }
-.voice-bar-input input {
+.voice-bar-input textarea {
   flex: 1; border: 0; outline: none; background: transparent;
   font: inherit; font-size: 14px; color: var(--ink);
+  resize: none; min-height: 22px; max-height: 120px;
+  line-height: 1.5; padding: 0;
+  align-self: center;
 }
-.voice-bar-input input::placeholder { color: #aab5c0; }
+.voice-bar-input textarea::placeholder { color: #aab5c0; }
 .voice-main-btn {
   width: 48px; height: 48px; border-radius: 50%;
   border: 0; background: var(--brand); color: #fff;
@@ -264,8 +297,26 @@ body.chat-active .chat-messages-wrap { display: block; }
 .side-card { padding: 8px 14px; border-radius: 12px; background: #f0f4ff; font-size: 12px; color: var(--ink); }
 .side-card strong { color: var(--brand); }
 
+/* ===== Phone Shell Appearance ===== */
+.phone-shell {
+  animation: phoneRise 0.5s ease-out;
+}
+@keyframes phoneRise {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ===== Responsive ===== */
-@media (max-width: 600px) {
+@media (max-width: 440px) {
+  body { padding: 0; align-items: stretch; }
+  .phone-shell {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+  }
+  .phone-shell::before { display: none; }
   .messages { padding: 12px; }
   .agent-inline-card { border-radius: 18px; padding: 14px; }
   .card-field-list, .quick-fill-grid { grid-template-columns: 1fr; }
@@ -273,8 +324,9 @@ body.chat-active .chat-messages-wrap { display: block; }
 </style>
 </head>
 <body>
-  <!-- Welcome Hero -->
-  <div class="welcome-hero">
+  <div class="phone-shell">
+    <!-- Welcome Hero -->
+    <div class="welcome-hero">
     <div class="welcome-hero-icon">🤖</div>
     <h1 class="welcome-hero-title">经销商资料录入助手</h1>
     <p class="welcome-hero-subtitle">你来说，我来整理。支持语音输入，自动识别主体信息、联系人、地址并完成创建前校验。</p>
@@ -307,7 +359,7 @@ body.chat-active .chat-messages-wrap { display: block; }
   <div class="voice-bar">
     <div class="voice-bar-row">
       <div class="voice-bar-input">
-        <input type="text" id="messageInput" placeholder="输入消息，或点击麦克风语音输入..." autofocus/>
+        <textarea id="messageInput" placeholder="输入消息，或点击麦克风语音输入..." rows="1" autofocus></textarea>
         <button class="button button-primary" id="sendButton">发送</button>
       </div>
       <button class="voice-main-btn" id="micButton" title="开始/停止录音">🎤</button>
@@ -317,6 +369,7 @@ body.chat-active .chat-messages-wrap { display: block; }
       <button class="voice-toggle-btn" id="newSessionBtn2">🔄 新会话</button>
     </div>
   </div>
+  </div><!-- .phone-shell -->
 </body>
 
 <script>
@@ -367,6 +420,7 @@ body.chat-active .chat-messages-wrap { display: block; }
     quickFillDraft = {};
     currentAddressConfirmation = null;
     messageInput.value = "";
+    messageInput.style.height = "auto";
     asrInputPrefix = "";
     asrTranscript = "";
     asrPreview = "";
@@ -407,10 +461,10 @@ body.chat-active .chat-messages-wrap { display: block; }
   }
 
   function renderEnumCard(fields) {
-    removeOldCards();
     if (!fields || fields.length === 0) return;
-    var structFields = fields.filter(function(f) { return fieldOptions[f]; });
-    if (structFields.length === 0) return;
+    var enumFields = fields.filter(function(f) { return fieldOptions[f]; });
+    var textFields = fields.filter(function(f) { return !fieldOptions[f]; });
+    if (enumFields.length === 0 && textFields.length === 0) return;
 
     var card = document.createElement("div");
     card.className = "agent-inline-card quick-fill-card";
@@ -430,10 +484,10 @@ body.chat-active .chat-messages-wrap { display: block; }
     grid.className = "quick-fill-grid";
 
     Object.keys(quickFillDraft).forEach(function(k) {
-      if (structFields.indexOf(k) === -1) delete quickFillDraft[k];
+      if (enumFields.indexOf(k) === -1) delete quickFillDraft[k];
     });
 
-    structFields.forEach(function(fieldPath) {
+    enumFields.forEach(function(fieldPath) {
       var config = fieldOptions[fieldPath];
       if (!config) return;
       var fieldDiv = document.createElement("div");
@@ -462,6 +516,38 @@ body.chat-active .chat-messages-wrap { display: block; }
       grid.appendChild(fieldDiv);
     });
     card.appendChild(grid);
+
+    // Text input fields (no enum options, e.g. contactName, mobile)
+    if (textFields.length > 0) {
+      var textGrid = document.createElement("div");
+      textGrid.className = "quick-fill-grid";
+      textFields.forEach(function(fieldPath) {
+        var labelText = fieldPath;
+        var parts = fieldPath.split(".");
+        if (parts.length >= 2) {
+          var fieldName = parts[parts.length - 1];
+          var labels = {contactName:"联系人姓名",mobile:"联系电话",wechat:"微信号",remark:"备注",position:"职位",contactName2:"第二联系人姓名",mobile2:"第二联系人电话"};
+          labelText = labels[fieldName] || fieldName;
+        }
+        var fieldDiv = document.createElement("div");
+        fieldDiv.className = "quick-fill-field";
+        var lbl = document.createElement("label");
+        lbl.className = "quick-fill-label";
+        lbl.textContent = labelText;
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.placeholder = "请输入" + labelText;
+        inp.value = quickFillDraft[fieldPath] || "";
+        inp.addEventListener("input", function() {
+          var v = inp.value.trim();
+          if (!v) { delete quickFillDraft[fieldPath]; return; }
+          quickFillDraft[fieldPath] = v;
+        });
+        fieldDiv.appendChild(lbl); fieldDiv.appendChild(inp);
+        textGrid.appendChild(fieldDiv);
+      });
+      card.appendChild(textGrid);
+    }
 
     var actions = document.createElement("div");
     actions.className = "card-actions";
@@ -524,10 +610,189 @@ body.chat-active .chat-messages-wrap { display: block; }
   }
 
   // Address card
-  function renderAddressCard(payload) {
-    removeOldCards();
-    currentAddressConfirmation = payload || null;
-    if (!payload || !payload.active) return;
+  function renderCompanyCard(companyFlow) {
+    if (!companyFlow) return;
+    // 只有 active 且 last_response 有 need_select 时才渲染
+    if (companyFlow.status !== "active" && companyFlow.status !== "selecting") return;
+    var resp = companyFlow.last_response;
+    if (!resp || !resp.candidates || resp.candidates.length === 0) return;
+
+    var card = document.createElement("div");
+    card.className = "agent-inline-card";
+    card.id = "companyCard";
+    var header = document.createElement("div");
+    header.className = "card-header";
+    var pill = document.createElement("span");
+    pill.className = "card-pill"; pill.textContent = "待选择";
+    var title = document.createElement("span");
+    title.className = "card-title-text"; title.textContent = "经销商名称确认";
+    header.appendChild(pill); header.appendChild(title);
+    card.appendChild(header);
+
+    var list = document.createElement("div");
+    list.className = "card-candidates";
+    resp.candidates.forEach(function(c) {
+      var item = document.createElement("div");
+      item.className = "candidate-item";
+      var left = document.createElement("div");
+      var name = document.createElement("div");
+      name.className = "candidate-name"; name.textContent = c.company_name;
+      var meta = document.createElement("div");
+      meta.className = "candidate-meta";
+      meta.textContent = c.source + " · 置信度 " + (c.match_confidence || "unknown");
+      if (c.match_reason) meta.textContent += " · " + c.match_reason;
+      left.appendChild(name); left.appendChild(meta);
+      var btn = document.createElement("button");
+      btn.className = "candidate-select-btn"; btn.textContent = "选择";
+      btn.addEventListener("click", function() {
+        commitCompanyChoice(c.candidate_id, c.company_name);
+        card.remove();
+      });
+      item.appendChild(left); item.appendChild(btn);
+      list.appendChild(item);
+    });
+    card.appendChild(list);
+
+    var manualSection = document.createElement("div");
+    manualSection.style.cssText = "border-top:1px solid var(--line);padding-top:12px;margin-top:4px;";
+
+    var manualLabel = document.createElement("div");
+    manualLabel.style.cssText = "font-size:12px;color:var(--muted);margin-bottom:8px;";
+    manualLabel.textContent = "没找到？手动输入经销商名称实时搜索：";
+    manualSection.appendChild(manualLabel);
+
+    var searchRow = document.createElement("div");
+    searchRow.style.cssText = "display:flex;gap:8px;align-items:center;";
+
+    var input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "输入经销商名称关键词...";
+    input.style.cssText = "flex:1;padding:10px 12px;border:1px solid #cfdbf1;border-radius:14px;font:inherit;font-size:13px;";
+
+    var searchBtn = document.createElement("button");
+    searchBtn.className = "button button-primary";
+    searchBtn.textContent = "搜索";
+    searchBtn.style.cssText = "flex-shrink:0;";
+
+    searchRow.appendChild(input); searchRow.appendChild(searchBtn);
+    manualSection.appendChild(searchRow);
+
+    // 搜索结果容器
+    var manualResults = document.createElement("div");
+    manualResults.className = "card-candidates";
+    manualResults.style.cssText = "margin-top:10px;";
+    manualSection.appendChild(manualResults);
+
+    // loading 提示
+    var searchLoading = document.createElement("div");
+    searchLoading.style.cssText = "display:none;text-align:center;padding:8px;font-size:12px;color:var(--muted);";
+    searchLoading.textContent = "搜索中...";
+    manualSection.appendChild(searchLoading);
+
+    var searchTimer = null;
+
+    function doSearch() {
+      var kw = input.value.trim();
+      if (!kw || kw.length < 2) {
+        manualResults.innerHTML = "";
+        return;
+      }
+      searchLoading.style.display = "block";
+      manualResults.innerHTML = "";
+      fetch("/api/qixin/companies/search", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({keyword: kw})
+      }).then(function(r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      }).then(function(payload) {
+        searchLoading.style.display = "none";
+        var items = (payload && payload.data && payload.data.items) || [];
+        if (items.length === 0) {
+          manualResults.innerHTML = '<div style="padding:12px;text-align:center;font-size:13px;color:var(--muted);">未找到匹配的公司，请调整关键词</div>';
+          // 添加直接确认按钮
+          var directDiv = document.createElement("div");
+          directDiv.style.cssText = "text-align:center;margin-top:8px;";
+          var directBtn = document.createElement("button");
+          directBtn.className = "button button-secondary";
+          directBtn.style.cssText = "font-size:13px;";
+          directBtn.textContent = '直接用 "' + kw + '" 确认';
+          directBtn.addEventListener("click", function() {
+            commitCompanyChoice("manual:" + kw, kw);
+            card.remove();
+          });
+          directDiv.appendChild(directBtn);
+          manualResults.appendChild(directDiv);
+          return;
+        }
+        items.forEach(function(item) {
+          manualResults.appendChild(buildCandidateItem(item, card));
+        });
+      }).catch(function(e) {
+        searchLoading.style.display = "none";
+        manualResults.innerHTML = '<div style="padding:12px;text-align:center;font-size:13px;color:var(--accent);">搜索失败：' + e.message + '</div>';
+      });
+    }
+
+    input.addEventListener("input", function() {
+      if (searchTimer) clearTimeout(searchTimer);
+      searchTimer = setTimeout(doSearch, 400);
+    });
+
+    searchBtn.addEventListener("click", doSearch);
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") { e.preventDefault(); doSearch(); }
+    });
+
+    card.appendChild(manualSection);
+
+    appendCard(card);
+  }
+
+  function buildCandidateItem(item, card) {
+    var div = document.createElement("div");
+    div.className = "candidate-item";
+    var left = document.createElement("div");
+    var name = document.createElement("div");
+    name.className = "candidate-name"; name.textContent = item.name;
+    var meta = document.createElement("div");
+    meta.className = "candidate-meta";
+    meta.textContent = (item.oper_name ? "法人:" + item.oper_name + " · " : "") + "启信宝";
+    left.appendChild(name); left.appendChild(meta);
+    var btn = document.createElement("button");
+    btn.className = "candidate-select-btn"; btn.textContent = "选择";
+    btn.addEventListener("click", function() {
+      commitCompanyChoice(item.id || item.name, item.name);
+      if (card && card.remove) card.remove();
+    });
+    div.appendChild(left); div.appendChild(btn);
+    return div;
+  }
+
+  async function commitCompanyChoice(candidateId, companyName) {
+    if (sending) return;
+    setSending(true);
+    try {
+      var resp = await fetch("/api/agent/distributors/company/commit", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          session_id: sessionId,
+          company_name: companyName
+        })
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var payload = await resp.json();
+      appendMessage("agent", payload.reply || "公司选择已确认");
+      renderAllCards(payload);
+    } catch(e) {
+      appendMessage("system", "公司确认失败：" + e.message);
+    } finally { setSending(false); }
+  }
+
+  function renderAddressCard(locationFlow) {
+    var resp = (locationFlow && locationFlow.last_response) ? locationFlow.last_response : null;
+    var active = locationFlow && (locationFlow.status === "active" || locationFlow.status === "paused");
+    if (!active || !resp) return;
 
     var card = document.createElement("div");
     card.className = "agent-inline-card";
@@ -543,29 +808,30 @@ body.chat-active .chat-messages-wrap { display: block; }
 
     var msg = document.createElement("p");
     msg.className = "address-message";
-    msg.textContent = payload.message || "请继续完成地址确认。";
+    msg.textContent = resp.suggested_reply || resp.message || "请确认门店地址。";
     card.appendChild(msg);
 
-    if (payload.candidates && payload.candidates.length > 0) {
+    if (resp.candidates && resp.candidates.length > 0) {
       var list = document.createElement("div");
       list.className = "card-candidates";
-      payload.candidates.forEach(function(candidate) {
+      resp.candidates.forEach(function(c) {
         var item = document.createElement("div");
         item.className = "candidate-item";
         var left = document.createElement("div");
         var name = document.createElement("div");
-        name.className = "candidate-name"; name.textContent = candidate.name || "地址候选";
+        name.className = "candidate-name"; name.textContent = c.label || c.full_address || "地址候选";
         var meta = document.createElement("div");
         meta.className = "candidate-meta";
-        var parts = [candidate.fullAddress];
-        if (candidate.geoSource) parts.push("来源 " + candidate.geoSource);
-        if (candidate.confidence) parts.push("置信度 " + candidate.confidence);
+        var parts = [];
+        if (c.detail_address || c.formatted_address) parts.push(c.formatted_address || c.detail_address);
+        else parts.push(c.full_address);
+        if (c.district_name) parts.unshift(c.district_name);
         meta.textContent = parts.join(" · ");
         left.appendChild(name); left.appendChild(meta);
         var btn = document.createElement("button");
         btn.className = "candidate-select-btn"; btn.textContent = "选择";
         btn.addEventListener("click", function() {
-          sendAddressAction("confirm_candidate", {candidate_id: candidate.candidate_id}, "确认地址：" + candidate.fullAddress);
+          commitLocationFromCandidate(c);
           card.remove();
         });
         item.appendChild(left); item.appendChild(btn);
@@ -574,17 +840,21 @@ body.chat-active .chat-messages-wrap { display: block; }
       card.appendChild(list);
     }
 
+    // 详细地址输入
     var manual = document.createElement("div");
     manual.className = "address-manual";
     var input = document.createElement("input");
-    input.type = "text"; input.placeholder = "或手动输入详细地址";
-    input.value = payload.pending_full_address || "";
+    input.type = "text"; input.placeholder = "或输入详细地址搜索确认";
+    if (resp.resolved_address && resp.resolved_address.full_address) {
+      input.value = resp.resolved_address.full_address;
+    }
     var searchBtn = document.createElement("button");
-    searchBtn.className = "button button-secondary"; searchBtn.textContent = "检索";
+    searchBtn.className = "button button-secondary"; searchBtn.textContent = "确认该地址";
     searchBtn.addEventListener("click", function() {
       var addr = input.value.trim();
       if (!addr) return;
-      sendAddressAction("resolve_text", {full_address: addr}, "手工输入地址：" + addr);
+      appendMessage("user", "确认地址：" + addr);
+      commitLocationManual(addr);
       card.remove();
     });
     manual.appendChild(input); manual.appendChild(searchBtn);
@@ -592,24 +862,27 @@ body.chat-active .chat-messages-wrap { display: block; }
 
     var actions = document.createElement("div");
     actions.className = "card-actions";
-    if (payload.can_use_current_location !== false) {
-      var locBtn = document.createElement("button");
-      locBtn.className = "button button-outline"; locBtn.textContent = "使用当前位置";
-      locBtn.addEventListener("click", requestCurrentLocationForAddress);
-      actions.appendChild(locBtn);
-    }
-    if (payload.can_skip !== false) {
-      var skipBtn = document.createElement("button");
-      skipBtn.className = "button button-outline"; skipBtn.textContent = "跳过";
-      skipBtn.addEventListener("click", function() {
-        sendAddressAction("skip", {}, "先跳过地址确认");
-        card.remove();
-      });
-      actions.appendChild(skipBtn);
-    }
+    var locBtn = document.createElement("button");
+    locBtn.className = "button button-outline"; locBtn.textContent = "使用当前位置";
+    locBtn.addEventListener("click", function() {
+      appendMessage("user", "使用当前位置确认地址");
+      commitLocationByGPS();
+      card.remove();
+    });
+    actions.appendChild(locBtn);
+    var skipBtn = document.createElement("button");
+    skipBtn.className = "button button-outline"; skipBtn.textContent = "跳过";
+    skipBtn.addEventListener("click", function() {
+      appendMessage("user", "先跳过地址确认");
+      commitLocationSkip();
+      card.remove();
+    });
+    actions.appendChild(skipBtn);
     card.appendChild(actions);
     appendCard(card);
   }
+
+
 
   // ===== API calls =====
   function setSending(v) { sending = v; updateControls(); }
@@ -618,7 +891,8 @@ body.chat-active .chat-messages-wrap { display: block; }
     var busy = sending || recording || awaitingAsrFinish;
     sendButton.disabled = busy;
     messageInput.readOnly = recording || awaitingAsrFinish;
-    micButton.disabled = busy && !recording;
+    messageInput.disabled = recording || awaitingAsrFinish;
+    micButton.disabled = sending || awaitingAsrFinish;
     if (recording) { micButton.classList.add("recording"); micButton.textContent = "⏹"; }
     else { micButton.classList.remove("recording"); micButton.textContent = "🎤"; }
   }
@@ -641,9 +915,7 @@ body.chat-active .chat-messages-wrap { display: block; }
       var payload = await resp.json();
       appendMessage("agent", payload.reply || "接口返回为空");
       stagePill.textContent = payload.stage || "录入中";
-      renderMissingFields(payload.missing_required_fields || []);
-      renderAddressCard(payload.address_confirmation || null);
-      renderCreatedResult(payload.created_result || null);
+      renderAllCards(payload);
     } catch(e) {
       appendMessage("system", "请求失败：" + e.message);
     } finally {
@@ -670,13 +942,146 @@ body.chat-active .chat-messages-wrap { display: block; }
       quickFillDraft = {};
       appendMessage("agent", payload.reply || "接口返回为空");
       stagePill.textContent = payload.stage || "录入中";
-      renderMissingFields(payload.missing_required_fields || []);
-      renderAddressCard(payload.address_confirmation || null);
-      renderCreatedResult(payload.created_result || null);
       removeOldCards();
+      renderAllCards(payload);
     } catch(e) {
       appendMessage("system", "请求失败：" + e.message);
     } finally { setSending(false); messageInput.focus(); }
+  }
+
+  async function commitLocationFromCandidate(candidate) {
+    if (sending) return;
+    setSending(true);
+    try {
+      var resp = await fetch("/api/agent/distributors/location/commit", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          session_id: sessionId,
+          location_agent_response: {
+            status: "resolved",
+            message: "已选择地址：" + (candidate.full_address || candidate.label),
+            suggested_reply: "已选择地址：" + (candidate.full_address || candidate.label),
+            candidates: [candidate],
+            resolved_address: {
+              full_address: candidate.full_address,
+              detail_address: candidate.detail_address,
+              formatted_address: candidate.formatted_address,
+              latitude: candidate.latitude,
+              longitude: candidate.longitude,
+              province_name: candidate.province_name,
+              city_name: candidate.city_name,
+              district_name: candidate.district_name,
+              geo_source: "amap_search",
+              confidence: "medium"
+            },
+            state: {"phase":"idle","candidates":[],"current_coordinates":null,"admin_hints":null,"pending_location_detail":null}
+          }
+        })
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var payload = await resp.json();
+      appendMessage("agent", payload.reply || "地址已确认");
+      renderAllCards(payload);
+    } catch(e) {
+      appendMessage("system", "地址确认失败：" + e.message);
+    } finally { setSending(false); }
+  }
+
+  async function commitLocationManual(fullAddress) {
+    if (sending) return;
+    setSending(true);
+    try {
+      var resp = await fetch("/api/agent/distributors/location/commit", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          session_id: sessionId,
+          location_agent_response: {
+            status: "resolved",
+            message: "已确认地址：" + fullAddress,
+            suggested_reply: "已确认地址：" + fullAddress,
+            candidates: [],
+            resolved_address: {
+              full_address: fullAddress,
+              geo_source: "manual",
+              confidence: "low"
+            },
+            state: {"phase":"idle","candidates":[],"current_coordinates":null,"admin_hints":null,"pending_location_detail":null}
+          }
+        })
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var payload = await resp.json();
+      appendMessage("agent", payload.reply || "地址已确认");
+      renderAllCards(payload);
+    } catch(e) {
+      appendMessage("system", "地址确认失败：" + e.message);
+    } finally { setSending(false); }
+  }
+
+  async function commitLocationSkip() {
+    if (sending) return;
+    setSending(true);
+    try {
+      var resp = await fetch("/api/agent/distributors/location/commit", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          session_id: sessionId,
+          location_agent_response: {
+            status: "skipped",
+            message: "已跳过地址确认。",
+            suggested_reply: "已跳过地址确认。",
+            candidates: [],
+            resolved_address: null,
+            state: {"phase":"idle","candidates":[],"current_coordinates":null,"admin_hints":null,"pending_location_detail":null}
+          }
+        })
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var payload = await resp.json();
+      appendMessage("agent", payload.reply || "已跳过地址");
+      renderAllCards(payload);
+    } catch(e) {
+      appendMessage("system", "地址跳过失败：" + e.message);
+    } finally { setSending(false); }
+  }
+
+  async function commitLocationByGPS() {
+    if (sending) return;
+    if (!navigator.geolocation) { appendMessage("system", "浏览器不支持地理定位"); return; }
+    setSending(true);
+    navigator.geolocation.getCurrentPosition(async function(pos) {
+      try {
+        var resp = await fetch("/api/agent/distributors/location/commit", {
+          method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            session_id: sessionId,
+            location_agent_response: {
+              status: "resolved",
+              message: "已使用当前位置。",
+              suggested_reply: "已使用当前位置。",
+              candidates: [],
+              resolved_address: {
+                full_address: pos.coords.latitude + "," + pos.coords.longitude,
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude,
+                geo_source: "gps",
+                confidence: "low"
+              },
+              state: {"phase":"idle","candidates":[],"current_coordinates":null,"admin_hints":null,"pending_location_detail":null}
+            }
+          })
+        });
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        var payload = await resp.json();
+        appendMessage("agent", payload.reply || "GPS位置已确认");
+        renderAllCards(payload);
+      } catch(e) {
+        appendMessage("system", "GPS确认失败：" + e.message);
+      } finally { setSending(false); }
+    }, function(err) {
+      setSending(false);
+      appendMessage("system", "无法获取位置：" + err.message);
+    }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 0});
   }
 
   async function sendAddressAction(action, extra, userText) {
@@ -692,9 +1097,7 @@ body.chat-active .chat-messages-wrap { display: block; }
       if (!resp.ok) throw new Error("HTTP " + resp.status + ": " + await resp.text());
       var payload = await resp.json();
       if (payload.reply) appendMessage("agent", payload.reply);
-      renderAddressCard(payload.address_confirmation || null);
-      renderMissingFields(payload.missing_required_fields || []);
-      renderCreatedResult(payload.created_result || null);
+      renderAllCards(payload);
     } catch(e) {
       appendMessage("system", "请求失败：" + e.message);
     } finally { setSending(false); }
@@ -709,6 +1112,53 @@ body.chat-active .chat-messages-wrap { display: block; }
     }, function(err) {
       appendMessage("system", "无法获取当前位置：" + err.message);
     }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 0});
+  }
+
+  function renderAllCards(payload) {
+    removeOldCards();
+    renderMissingFields(payload.missing_required_fields || []);
+    renderAddressCard(payload.location_flow || null);
+    renderCompanyCard(payload.company_flow || null);
+    renderCreatedResult(payload.created_result || null);
+    // 如果地址流 active 但没有 last_response，触发自动搜索
+    if (payload.location_flow && payload.location_flow.status === "active" && !payload.location_flow.last_response) {
+      fetchLocationCandidates(payload.location_flow);
+    }
+  }
+
+  async function fetchLocationCandidates(locationFlow) {
+    var query = locationFlow.original_user_message || "";
+    if (!query) return;
+    try {
+      var resp = await fetch("/api/location-agent/search", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({query: query})
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var payload = await resp.json();
+      // Sync back to backend
+      var syncResp = await fetch("/api/agent/distributors/location/sync", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          session_id: sessionId,
+          original_user_message: query,
+          location_agent_response: {
+            status: "active",
+            message: "请从下方选择地址或手动输入。",
+            suggested_reply: "请从下方选择地址或手动输入。",
+            candidates: payload.candidates || [],
+            resolved_address: null,
+            state: {"phase":"idle","candidates":[],"current_coordinates":null,"admin_hints":null,"pending_location_detail":null}
+          }
+        })
+      });
+      if (!syncResp.ok) throw new Error("HTTP " + syncResp.status);
+      var syncPayload = await syncResp.json();
+      removeOldCards();
+      renderAddressCard(syncPayload.location_flow || null);
+    } catch(e) {
+      console.warn("位置搜索失败：", e.message);
+    }
   }
 
   function renderMissingFields(fields) {
@@ -759,14 +1209,44 @@ body.chat-active .chat-messages-wrap { display: block; }
     return proto + "//" + window.location.host + "/api/agent/distributors/asr/realtime";
   }
 
+  function makeVoiceUiError(statusText, detailText, errorMessage) {
+    enterChatMode();
+    setVoiceStatus(statusText);
+    appendMessage("system", detailText);
+    var err = new Error(errorMessage || detailText);
+    err.voiceUiHandled = true;
+    return err;
+  }
+
+  function cnNumToArabic(text) {
+    var singleMap = {"零":0,"一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"幺":1,"两":2,"〇":0};
+    // 连续3位以上中文数字 → 阿拉伯数字
+    text = text.replace(/[零一二三四五六七八九幺两〇]{3,}/g, function(m) {
+      var r = "";
+      for (var i = 0; i < m.length; i++) { var d = singleMap[m[i]]; r += (d !== undefined ? d : m[i]); }
+      return r;
+    });
+    // 语音识别口语 → 符号（仅在数字/字母上下文中的"点"转为"."）
+    text = text.split("艾特").join("@");
+    text = text.replace(/(\d)点(\w)/g, "$1.$2");
+    text = text.replace(/(\w)点(\d)/g, "$1.$2");
+    return text;
+  }
+
   function composeAsrDraft() {
     var block = (asrTranscript + asrPreview).trim();
+    block = cnNumToArabic(block);
     if (!asrInputPrefix) return block;
     if (!block) return asrInputPrefix;
     return asrInputPrefix + "\n" + block;
   }
 
-  function refreshAsrDraft() { messageInput.value = composeAsrDraft(); }
+  function autoResizeTextarea() {
+    messageInput.style.height = "auto";
+    messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + "px";
+  }
+
+  function refreshAsrDraft() { messageInput.value = composeAsrDraft(); autoResizeTextarea(); }
 
   function cleanupRecordingResources() {
     if (asrProcessorNode) { asrProcessorNode.disconnect(); asrProcessorNode.onaudioprocess = null; asrProcessorNode = null; }
@@ -829,14 +1309,24 @@ body.chat-active .chat-messages-wrap { display: block; }
   }
 
   async function startRecording() {
-    if (sending || recording || awaitingAsrFinish) return;
+    if (sending || recording || awaitingAsrFinish) { return; }
+    if (!window.isSecureContext) {
+      throw makeVoiceUiError(
+        "当前页面不支持语音输入",
+        "当前页面不是安全上下文，语音输入需要在 HTTPS 或 localhost 下使用。请使用 HTTPS 或 localhost 打开页面。"
+      );
+    }
+    if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+      throw makeVoiceUiError(
+        "浏览器不支持麦克风",
+        "当前浏览器不支持麦克风采集，请改用最新版 Chrome 或 Safari，并确认页面运行在 HTTPS 或 localhost。"
+      );
+    }
     try {
       setVoiceStatus("正在请求麦克风权限...");
       asrStream = await navigator.mediaDevices.getUserMedia({audio: true});
     } catch(e) {
-      setVoiceStatus("麦克风权限失败");
-      appendMessage("system", "无法开始录音：" + e.message);
-      return;
+      throw makeVoiceUiError("麦克风权限失败", "无法开始录音：" + e.message, e.message);
     }
     asrInputPrefix = messageInput.value.trim();
     asrTranscript = "";
@@ -857,12 +1347,17 @@ body.chat-active .chat-messages-wrap { display: block; }
       if (payload.type === "partial") { asrTranscript = payload.text || ""; asrPreview = payload.stash || ""; refreshAsrDraft(); return; }
       if (payload.type === "final") { asrTranscript = payload.text || ""; asrPreview = ""; refreshAsrDraft(); return; }
       if (payload.type === "finished") { finishRecording("识别完成，请检查后发送"); return; }
-      if (payload.type === "error") { appendMessage("system", "语音识别失败：" + (payload.message || "未知错误")); finishRecording("语音识别失败"); }
+      if (payload.type === "error") {
+        enterChatMode();
+        appendMessage("system", "语音识别失败：" + (payload.message || "未知错误"));
+        finishRecording("语音识别失败");
+      }
     });
     asrSocket.addEventListener("close", function() {
       if (recording || awaitingAsrFinish) finishRecording("语音会话已关闭");
     });
     asrSocket.addEventListener("error", function() {
+      enterChatMode();
       appendMessage("system", "实时语音识别连接异常。");
       finishRecording("语音识别连接异常");
     });
@@ -882,10 +1377,16 @@ body.chat-active .chat-messages-wrap { display: block; }
   messageInput.addEventListener("keydown", function(evt) {
     if (evt.key === "Enter" && !evt.shiftKey) { evt.preventDefault(); sendMessage(); }
   });
+  messageInput.addEventListener("input", autoResizeTextarea);
 
   micButton.addEventListener("click", function() {
-    if (recording) stopRecording();
-    else startRecording();
+    if (recording) { stopRecording(); return; }
+    startRecording().catch(function(e) {
+      if (e && e.voiceUiHandled) { return; }
+      setVoiceStatus("录音启动失败");
+      enterChatMode();
+      appendMessage("system", "录音失败：" + e.message);
+    });
   });
 
   newSessionButton.addEventListener("click", resetSession);
