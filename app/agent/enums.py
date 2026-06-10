@@ -106,6 +106,26 @@ FIELD_OPTION_DEFINITIONS: dict[str, dict[str, Any]] = {
             {"label": "2.0", "value": 2.0},
         ],
     },
+    "contacts[0].position": {
+        "label": "联系人职位",
+        "input_type": "select",
+        "options": [
+            {"label": "销售", "value": "销售"},
+            {"label": "老板", "value": "老板"},
+            {"label": "总经理", "value": "总经理"},
+            {"label": "采购", "value": "采购"},
+            {"label": "财务", "value": "财务"},
+            {"label": "店长", "value": "店长"},
+            {"label": "负责人", "value": "负责人"},
+        ],
+    },
+    "contacts[0].wechat": {
+        "label": "联系人微信",
+        "input_type": "select",
+        "options": [
+            {"label": "同手机号", "value": "same_as_mobile"},
+        ],
+    },
 }
 
 
@@ -117,24 +137,49 @@ def validate_structured_patch(patch: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(patch, dict) or not patch:
         raise ValueError("patch must be a non-empty object")
 
-    unsupported_sections = [key for key in patch if key != "main_info"]
+    unsupported_sections = [key for key in patch if key not in {"main_info", "contacts"}]
     if unsupported_sections:
         unsupported = ", ".join(sorted(unsupported_sections))
         raise ValueError(f"Unsupported structured patch sections: {unsupported}")
 
-    main_info = patch.get("main_info")
-    if not isinstance(main_info, dict) or not main_info:
-        raise ValueError("patch.main_info must be a non-empty object")
+    normalized_patch: dict[str, Any] = {}
 
-    normalized_patch: dict[str, Any] = {"main_info": {}}
-    for field_name, value in main_info.items():
-        path = f"main_info.{field_name}"
-        config = FIELD_OPTION_DEFINITIONS.get(path)
-        if config is None:
-            raise ValueError(f"Unsupported structured field: {path}")
-        if not _is_allowed_option_value(config["options"], value):
-            raise ValueError(f"Invalid value for {path}: {value!r}")
-        normalized_patch["main_info"][field_name] = value
+    main_info = patch.get("main_info")
+    if main_info is not None:
+        if not isinstance(main_info, dict) or not main_info:
+            raise ValueError("patch.main_info must be a non-empty object")
+        normalized_patch["main_info"] = {}
+        for field_name, value in main_info.items():
+            path = f"main_info.{field_name}"
+            config = FIELD_OPTION_DEFINITIONS.get(path)
+            if config is None:
+                raise ValueError(f"Unsupported structured field: {path}")
+            if not _is_allowed_option_value(config["options"], value):
+                raise ValueError(f"Invalid value for {path}: {value!r}")
+            normalized_patch["main_info"][field_name] = value
+
+    contacts = patch.get("contacts")
+    if contacts is not None:
+        if not isinstance(contacts, list) or not contacts:
+            raise ValueError("patch.contacts must be a non-empty list")
+        normalized_contacts: list[dict[str, Any]] = []
+        for index, item in enumerate(contacts):
+            if not isinstance(item, dict) or not item:
+                raise ValueError(f"patch.contacts[{index}] must be a non-empty object")
+            normalized_contact: dict[str, Any] = {}
+            for field_name, value in item.items():
+                path = f"contacts[0].{field_name}"
+                config = FIELD_OPTION_DEFINITIONS.get(path)
+                if config is None:
+                    raise ValueError(f"Unsupported structured field: {path}")
+                if not _is_allowed_option_value(config["options"], value):
+                    raise ValueError(f"Invalid value for {path}: {value!r}")
+                normalized_contact[field_name] = value
+            normalized_contacts.append(normalized_contact)
+        normalized_patch["contacts"] = normalized_contacts
+
+    if not normalized_patch:
+        raise ValueError("patch must include at least one supported section")
 
     return normalized_patch
 

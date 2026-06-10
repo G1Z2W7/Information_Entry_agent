@@ -119,6 +119,26 @@ def test_merge_state_modification_prefers_single_existing_contact_for_mobile_upd
     assert state.contacts[0].mobile == "18800000001"
 
 
+def test_merge_state_prefers_single_existing_contact_for_fragment_follow_up() -> None:
+    state = SessionState(
+        session_id="session-merge-5b",
+        contacts=[Contact(contactName="王五", mobile="13900139000", isPrimary=True)],
+    )
+
+    merge_state(
+        state,
+        {"contacts": [{"position": "销售", "wechat": "same_as_mobile"}]},
+        turn_number=7,
+        source_text="联系人职位是销售，微信就是手机号",
+    )
+
+    assert len(state.contacts) == 1
+    assert state.contacts[0].contactName == "王五"
+    assert state.contacts[0].position == "销售"
+    assert state.contacts[0].mobile == "13900139000"
+    assert state.contacts[0].wechat == "13900139000"
+
+
 def test_merge_state_modification_prefers_single_existing_site_for_address_update() -> None:
     state = SessionState(
         session_id="session-merge-6",

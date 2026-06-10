@@ -244,6 +244,82 @@
         outline: none;
       }
 
+      .address-panel {
+        margin-bottom: 14px;
+        padding: 14px;
+        border: 1px solid #d9cfbd;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #fffdf8 0%, #f9f1e4 100%);
+      }
+
+      .address-panel[hidden] {
+        display: none;
+      }
+
+      .address-message {
+        margin: 0 0 10px;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .address-candidate-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .address-candidate {
+        padding: 12px;
+        border: 1px solid #e7dfd0;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      .address-candidate-name {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .address-candidate-text {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .address-candidate-actions {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .address-manual {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .address-manual input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font: inherit;
+        color: var(--ink);
+        background: #fff;
+        outline: none;
+      }
+
+      .address-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
       .quick-fill-actions {
         display: flex;
         justify-content: flex-end;
@@ -406,6 +482,23 @@
                   <button class="button button-secondary" id="quickFillButton" type="button">提交选择</button>
                 </div>
               </div>
+              <div class="address-panel" id="addressPanel" hidden>
+                <p class="quick-fill-title">地址确认</p>
+                <p class="address-message" id="addressMessage"></p>
+                <div class="address-candidate-list" id="addressCandidateList"></div>
+                <div class="address-manual">
+                  <input
+                    id="addressManualInput"
+                    type="text"
+                    placeholder="手工输入详细地址，例如：上海市浦东新区张江高科技园区碧波路888号"
+                  />
+                  <button class="button button-secondary" id="addressManualButton" type="button">检索地址</button>
+                </div>
+                <div class="address-actions">
+                  <button class="button button-secondary" id="addressUseCurrentButton" type="button">使用当前位置</button>
+                  <button class="button button-secondary" id="addressSkipButton" type="button">跳过本次</button>
+                </div>
+              </div>
               <div class="voice-toolbar">
                 <div class="voice-actions">
                   <button class="button button-secondary" id="startRecordingButton" type="button">开始录音</button>
@@ -455,6 +548,13 @@
       const quickFillPanel = document.getElementById("quickFillPanel");
       const quickFillGrid = document.getElementById("quickFillGrid");
       const quickFillButton = document.getElementById("quickFillButton");
+      const addressPanel = document.getElementById("addressPanel");
+      const addressMessage = document.getElementById("addressMessage");
+      const addressCandidateList = document.getElementById("addressCandidateList");
+      const addressManualInput = document.getElementById("addressManualInput");
+      const addressManualButton = document.getElementById("addressManualButton");
+      const addressUseCurrentButton = document.getElementById("addressUseCurrentButton");
+      const addressSkipButton = document.getElementById("addressSkipButton");
       const startRecordingButton = document.getElementById("startRecordingButton");
       const stopRecordingButton = document.getElementById("stopRecordingButton");
       const voiceStatus = document.getElementById("voiceStatus");
@@ -469,6 +569,7 @@
       let currentMissingFields = [];
       let fieldOptions = {};
       let quickFillDraft = {};
+      let currentAddressConfirmation = null;
       let recording = false;
       let awaitingAsrFinish = false;
       let asrSocket = null;
@@ -495,6 +596,7 @@
         renderMissingFields([]);
         renderCreatedResult(null);
         renderQuickFill([]);
+        renderAddressConfirmation(null);
         quickFillDraft = {};
         appendMessage(
           "system",
@@ -557,6 +659,69 @@
           item.textContent = `${key}: ${String(value)}`;
           createdResultList.appendChild(item);
         });
+      }
+
+      function renderAddressConfirmation(payload) {
+        currentAddressConfirmation = payload || null;
+        addressCandidateList.innerHTML = "";
+
+        if (!payload || !payload.active) {
+          addressPanel.hidden = true;
+          addressMessage.textContent = "";
+          return;
+        }
+
+        addressPanel.hidden = false;
+        addressMessage.textContent = payload.message || "请继续完成地址确认。";
+
+        if (!addressManualInput.value && payload.pending_full_address) {
+          addressManualInput.value = payload.pending_full_address;
+        }
+
+        (payload.candidates || []).forEach((candidate) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "address-candidate";
+
+          const name = document.createElement("p");
+          name.className = "address-candidate-name";
+          name.textContent = candidate.name || "地址候选";
+
+          const text = document.createElement("p");
+          text.className = "address-candidate-text";
+          const meta = [candidate.fullAddress];
+          if (candidate.geoSource) {
+            meta.push(`来源 ${candidate.geoSource}`);
+          }
+          if (candidate.confidence) {
+            meta.push(`置信度 ${candidate.confidence}`);
+          }
+          text.textContent = meta.join(" · ");
+
+          const actions = document.createElement("div");
+          actions.className = "address-candidate-actions";
+
+          const confirmButton = document.createElement("button");
+          confirmButton.className = "button button-primary";
+          confirmButton.type = "button";
+          confirmButton.textContent = "确认这个地址";
+          confirmButton.disabled = sending || recording || awaitingAsrFinish;
+          confirmButton.addEventListener("click", () => {
+            sendAddressAction(
+              "confirm_candidate",
+              { candidate_id: candidate.candidate_id },
+              `确认地址：${candidate.fullAddress}`
+            );
+          });
+
+          actions.appendChild(confirmButton);
+          wrapper.appendChild(name);
+          wrapper.appendChild(text);
+          wrapper.appendChild(actions);
+          addressCandidateList.appendChild(wrapper);
+        });
+
+        addressUseCurrentButton.hidden = payload.can_use_current_location === false;
+        addressSkipButton.hidden = payload.can_skip === false;
       }
 
       function renderQuickFill(fields) {
@@ -632,6 +797,19 @@
         if (!section || !fieldName) {
           return;
         }
+        const listMatch = section.match(/^([a-zA-Z_]+)\[(\d+)\]$/);
+        if (listMatch) {
+          const [, listName, rawIndex] = listMatch;
+          const index = Number(rawIndex);
+          if (!target[listName]) {
+            target[listName] = [];
+          }
+          if (!target[listName][index]) {
+            target[listName][index] = {};
+          }
+          target[listName][index][fieldName] = value;
+          return;
+        }
         if (!target[section]) {
           target[section] = {};
         }
@@ -650,6 +828,19 @@
           const displayValue = selectedOption ? selectedOption.label : String(value);
           segments.push(`${config.label}=${displayValue}`);
         });
+        (patch.contacts || []).forEach((contact, index) => {
+          Object.entries(contact).forEach(([fieldName, value]) => {
+            const fieldPath = `contacts[${index}].${fieldName}`;
+            const fallbackFieldPath = `contacts[0].${fieldName}`;
+            const config = fieldOptions[fieldPath] || fieldOptions[fallbackFieldPath];
+            if (!config) {
+              return;
+            }
+            const selectedOption = config.options.find((option) => option.value === value);
+            const displayValue = selectedOption ? selectedOption.label : String(value);
+            segments.push(`${config.label}=${displayValue}`);
+          });
+        });
         return segments.join("，");
       }
 
@@ -658,9 +849,13 @@
         sendButton.disabled = busy;
         quickFillButton.disabled = busy;
         newSessionButton.disabled = busy;
+        addressManualButton.disabled = busy;
+        addressUseCurrentButton.disabled = busy;
+        addressSkipButton.disabled = busy;
         startRecordingButton.disabled = busy;
         stopRecordingButton.disabled = !recording || awaitingAsrFinish;
         messageInput.readOnly = recording || awaitingAsrFinish;
+        addressManualInput.readOnly = busy;
       }
 
       function setSending(nextSending) {
@@ -912,6 +1107,7 @@
           stageMetric.textContent = payload.stage || "unknown";
           renderMissingFields(payload.missing_required_fields || []);
           renderCreatedResult(payload.created_result || null);
+          renderAddressConfirmation(payload.address_confirmation || null);
         } catch (error) {
           appendMessage("system", `请求失败：${error.message}`);
         } finally {
@@ -920,13 +1116,96 @@
         }
       }
 
+      async function sendAddressAction(action, extraPayload = {}, userText = "") {
+        if (sending || recording || awaitingAsrFinish) {
+          return;
+        }
+
+        setSending(true);
+        if (userText) {
+          appendMessage("user", userText);
+        }
+
+        try {
+          const response = await fetch("/api/agent/distributors/address/resolve", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              action,
+              ...extraPayload,
+            }),
+          });
+
+          if (!response.ok) {
+            const fallbackText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
+          }
+
+          const payload = await response.json();
+          appendMessage("agent", payload.suggested_reply || payload.message || "地址确认已更新");
+          if (payload.stage) {
+            stageMetric.textContent = payload.stage;
+          }
+          if (payload.missing_required_fields) {
+            renderMissingFields(payload.missing_required_fields);
+          }
+          renderAddressConfirmation(payload.address_confirmation || null);
+          if (!payload.address_confirmation) {
+            addressManualInput.value = "";
+          }
+        } catch (error) {
+          appendMessage("system", `请求失败：${error.message}`);
+        } finally {
+          setSending(false);
+          messageInput.focus();
+        }
+      }
+
+      function requestCurrentLocationForAddress() {
+        if (!navigator.geolocation) {
+          appendMessage("system", "当前浏览器不支持地理定位。");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            sendAddressAction(
+              "use_current_location",
+              {
+                current_location: {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracyMeters: position.coords.accuracy || null,
+                },
+              },
+              "使用当前位置确认地址"
+            );
+          },
+          (error) => {
+            appendMessage("system", `无法获取当前位置：${error.message}`);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+          }
+        );
+      }
+
       async function sendStructuredFields() {
         if (sending || recording || awaitingAsrFinish) {
           return;
         }
 
         const patch = buildStructuredPatch();
-        if (!patch.main_info || Object.keys(patch.main_info).length === 0) {
+        const hasMainInfo = patch.main_info && Object.keys(patch.main_info).length > 0;
+        const hasContacts =
+          Array.isArray(patch.contacts) &&
+          patch.contacts.some((contact) => Object.keys(contact || {}).length > 0);
+        if (!hasMainInfo && !hasContacts) {
           appendMessage("system", "请先选择至少一个标准字段。");
           return;
         }
@@ -982,6 +1261,18 @@
 
       sendButton.addEventListener("click", sendMessage);
       quickFillButton.addEventListener("click", sendStructuredFields);
+      addressManualButton.addEventListener("click", () => {
+        const fullAddress = addressManualInput.value.trim();
+        if (!fullAddress) {
+          appendMessage("system", "请先输入详细地址。");
+          return;
+        }
+        sendAddressAction("resolve_text", { full_address: fullAddress }, `手工输入地址：${fullAddress}`);
+      });
+      addressUseCurrentButton.addEventListener("click", requestCurrentLocationForAddress);
+      addressSkipButton.addEventListener("click", () => {
+        sendAddressAction("skip", {}, "先跳过地址确认");
+      });
       startRecordingButton.addEventListener("click", startRecording);
       stopRecordingButton.addEventListener("click", stopRecording);
       newSessionButton.addEventListener("click", resetSession);
@@ -989,6 +1280,12 @@
         if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault();
           sendMessage();
+        }
+      });
+      addressManualInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          addressManualButton.click();
         }
       });
 

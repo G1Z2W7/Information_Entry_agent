@@ -44,6 +44,7 @@ POSITION_TOKENS = (
     "总经理",
     "门店负责人",
     "销售负责人",
+    "销售",
     "采购",
     "财务",
     "经理",
@@ -279,6 +280,13 @@ def _looks_like_contact_clause(clause: str) -> bool:
 
 
 def _extract_position_and_name(clause: str) -> tuple[str | None, str | None]:
+    explicit_position_match = re.search(
+        rf"(?:联系人)?职位\s*(?:是|为)?\s*(?P<position>{'|'.join(map(re.escape, POSITION_TOKENS))})",
+        clause,
+    )
+    if explicit_position_match:
+        return explicit_position_match.group("position"), None
+
     for position in POSITION_TOKENS:
         pattern = re.compile(rf"{re.escape(position)}(?P<name>[\u4e00-\u9fa5]{{1,6}})")
         match = pattern.search(clause)
@@ -293,6 +301,12 @@ def _extract_position_and_name(clause: str) -> tuple[str | None, str | None]:
 
 
 def _extract_wechat(clause: str) -> str | None:
+    if re.search(
+        r"微信(?:号)?\s*(?:是|为|就是)?\s*(?:同手机号|同手机|就是电话|就是手机号|手机号|电话)",
+        clause,
+    ):
+        return "same_as_mobile"
+
     if re.search(r"微信(?:同手机号|同手机|就是电话|就是手机号)", clause):
         return "same_as_mobile"
 

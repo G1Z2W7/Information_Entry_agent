@@ -44,3 +44,25 @@ def test_rule_extractor_handles_no_points_case() -> None:
     assert patch["main_info"]["providePoints"] is False
     assert patch["main_info"]["providePointsRatio"] == 0.0
     assert patch["main_info"]["status"] == "disabled"
+
+
+def test_rule_extractor_parses_contact_fragment_with_explicit_position_and_wechat_alias() -> None:
+    patch = extract_rule_based_patch("联系人职位是销售，微信号是手机号")
+
+    assert patch["contacts"] == [
+        {
+            "position": "销售",
+            "wechat": "same_as_mobile",
+        }
+    ]
+
+
+def test_rule_extractor_parses_compact_contact_fragment_without_fake_name() -> None:
+    patch = extract_rule_based_patch("联系人职位销售微信就是手机号")
+
+    assert patch["contacts"] == [
+        {
+            "position": "销售",
+            "wechat": "same_as_mobile",
+        }
+    ]

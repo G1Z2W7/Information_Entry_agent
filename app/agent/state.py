@@ -281,6 +281,16 @@ def _find_contact_match_index(
         if len(matching_indexes) == 1:
             return matching_indexes[0]
 
+    if not incoming_contact.contactName and not incoming_contact.mobile:
+        if len(existing_contacts) == 1:
+            return 0
+
+        primary_indexes = [
+            index for index, contact in enumerate(existing_contacts) if contact.isPrimary is True
+        ]
+        if len(primary_indexes) == 1:
+            return primary_indexes[0]
+
     if is_modification:
         if len(existing_contacts) == 1 and not _contact_looks_like_new_addition(incoming_contact):
             return 0

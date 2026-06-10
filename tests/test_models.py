@@ -4,9 +4,11 @@ import pytest
 from pydantic import ValidationError
 
 from app.agent.models import (
+    AddressActionType,
     AddressResolutionRequest,
     Contact,
     CurrentLocation,
+    LocationFlowStatus,
     MainInfo,
     SessionStage,
     SessionState,
@@ -23,6 +25,8 @@ def test_session_state_defaults_are_initialized() -> None:
     assert state.contacts == []
     assert state.sites == []
     assert state.creation_ready is False
+    assert state.location_state.status == LocationFlowStatus.IDLE
+    assert state.location_state.dismissed is False
 
 
 def test_invalid_status_value_is_rejected() -> None:
@@ -70,6 +74,23 @@ def test_structured_patch_request_rejects_invalid_enum_value() -> None:
         )
 
 
+def test_structured_patch_request_accepts_contact_fields() -> None:
+    request = StructuredPatchRequest(
+        session_id="session-structured-3",
+        patch={
+            "contacts": [
+                {
+                    "position": "销售",
+                    "wechat": "same_as_mobile",
+                }
+            ]
+        },
+    )
+
+    assert request.patch["contacts"][0]["position"] == "销售"
+    assert request.patch["contacts"][0]["wechat"] == "same_as_mobile"
+
+
 def test_site_model_accepts_future_geo_fields() -> None:
     site = Site(
         fullAddress="浙江省杭州市西湖区文三路18号",
@@ -98,3 +119,14 @@ def test_address_resolution_request_accepts_current_location() -> None:
 
     assert request.current_location is not None
     assert request.current_location.latitude == 30.2741
+
+
+def test_address_resolution_request_accepts_confirm_candidate_action() -> None:
+    request = AddressResolutionRequest(
+        session_id="session-address-2",
+        action=AddressActionType.CONFIRM_CANDIDATE,
+        candidate_id="cand-1",
+    )
+
+    assert request.action == AddressActionType.CONFIRM_CANDIDATE
+    assert request.candidate_id == "cand-1"
