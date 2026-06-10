@@ -60,7 +60,7 @@ async def bridge_qwen_realtime_asr(client_ws: WebSocket) -> None:
         "OpenAI-Beta": "realtime=v1",
     }
 
-    async with ws_connect(config.upstream_url, additional_headers=headers) as upstream:
+    async with ws_connect(config.upstream_url, additional_headers=headers, proxy=None) as upstream:
         await _forward_client_session(client_ws, upstream)
 
 

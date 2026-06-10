@@ -1,1297 +1,906 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>经销商 Agent 联调页</title>
-    <style>
-      :root {
-        --bg: #f5f1e8;
-        --panel: #fffdf8;
-        --ink: #1d2a36;
-        --muted: #66727d;
-        --line: #ddd4c4;
-        --accent: #b8562a;
-        --accent-soft: #f3e1d7;
-        --user: #1d2a36;
-        --agent: #ffffff;
-        --shadow: 0 18px 40px rgba(29, 42, 54, 0.08);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background:
-          radial-gradient(circle at top left, rgba(184, 86, 42, 0.12), transparent 28%),
-          linear-gradient(180deg, #f7f3ea 0%, var(--bg) 100%);
-        color: var(--ink);
-        font-family: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
-      }
-
-      .page {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 28px 18px 32px;
-      }
-
-      .shell {
-        background: rgba(255, 253, 248, 0.92);
-        border: 1px solid rgba(221, 212, 196, 0.9);
-        border-radius: 24px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        backdrop-filter: blur(12px);
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 22px 24px 18px;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .title {
-        margin: 0;
-        font-size: 26px;
-        line-height: 1.1;
-        letter-spacing: -0.03em;
-      }
-
-      .subtitle {
-        margin: 8px 0 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .controls {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-
-      .session-pill {
-        padding: 10px 12px;
-        border-radius: 999px;
-        background: #f1ebdf;
-        color: var(--ink);
-        font-size: 12px;
-        max-width: 240px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .button {
-        border: 0;
-        border-radius: 999px;
-        padding: 10px 16px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 120ms ease, opacity 120ms ease;
-      }
-
-      .button:hover {
-        transform: translateY(-1px);
-      }
-
-      .button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .button-secondary {
-        background: #e7dfd0;
-        color: var(--ink);
-      }
-
-      .button-primary {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      .body {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 280px;
-        min-height: 620px;
-      }
-
-      .chat-panel {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        border-right: 1px solid var(--line);
-      }
-
-      .messages {
-        flex: 1;
-        padding: 22px;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0)),
-          transparent;
-      }
-
-      .message {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        max-width: 85%;
-      }
-
-      .message-user {
-        align-self: flex-end;
-      }
-
-      .message-agent,
-      .message-system {
-        align-self: flex-start;
-      }
-
-      .message-label {
-        font-size: 12px;
-        color: var(--muted);
-      }
-
-      .message-bubble {
-        border-radius: 18px;
-        padding: 14px 16px;
-        font-size: 14px;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-
-      .message-user .message-bubble {
-        background: var(--user);
-        color: #fff;
-        border-bottom-right-radius: 6px;
-      }
-
-      .message-agent .message-bubble {
-        background: var(--agent);
-        border: 1px solid #e7dfd0;
-        border-bottom-left-radius: 6px;
-      }
-
-      .message-system .message-bubble {
-        background: var(--accent-soft);
-        color: #6e3a20;
-        border-bottom-left-radius: 6px;
-      }
-
-      .composer {
-        padding: 18px 22px 22px;
-        border-top: 1px solid var(--line);
-        background: rgba(255, 253, 248, 0.96);
-      }
-
-      .quick-fill {
-        margin-bottom: 14px;
-        padding: 14px;
-        border: 1px solid #e7dfd0;
-        border-radius: 18px;
-        background: #fffaf3;
-      }
-
-      .quick-fill[hidden] {
-        display: none;
-      }
-
-      .quick-fill-title {
-        margin: 0 0 8px;
-        font-size: 13px;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-
-      .quick-fill-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      .quick-fill-field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .quick-fill-label {
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .quick-fill select {
-        width: 100%;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 10px 12px;
-        font: inherit;
-        color: var(--ink);
-        background: #fff;
-        outline: none;
-      }
-
-      .address-panel {
-        margin-bottom: 14px;
-        padding: 14px;
-        border: 1px solid #d9cfbd;
-        border-radius: 18px;
-        background: linear-gradient(180deg, #fffdf8 0%, #f9f1e4 100%);
-      }
-
-      .address-panel[hidden] {
-        display: none;
-      }
-
-      .address-message {
-        margin: 0 0 10px;
-        font-size: 14px;
-        line-height: 1.6;
-      }
-
-      .address-candidate-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-
-      .address-candidate {
-        padding: 12px;
-        border: 1px solid #e7dfd0;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.78);
-      }
-
-      .address-candidate-name {
-        margin: 0 0 4px;
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      .address-candidate-text {
-        margin: 0;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.6;
-      }
-
-      .address-candidate-actions {
-        margin-top: 10px;
-        display: flex;
-        justify-content: flex-end;
-      }
-
-      .address-manual {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 10px;
-        margin-bottom: 12px;
-      }
-
-      .address-manual input {
-        width: 100%;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 10px 12px;
-        font: inherit;
-        color: var(--ink);
-        background: #fff;
-        outline: none;
-      }
-
-      .address-actions {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .quick-fill-actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 12px;
-      }
-
-      .voice-toolbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-        padding: 12px 14px;
-        border: 1px solid #e7dfd0;
-        border-radius: 16px;
-        background: #fffaf3;
-      }
-
-      .voice-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .voice-status {
-        color: var(--muted);
-        font-size: 12px;
-      }
-
-      .composer-row {
-        display: flex;
-        gap: 12px;
-        align-items: flex-end;
-      }
-
-      .composer textarea {
-        flex: 1;
-        min-height: 96px;
-        resize: vertical;
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        padding: 14px 16px;
-        font: inherit;
-        color: var(--ink);
-        background: #fff;
-        outline: none;
-      }
-
-      .composer textarea:focus {
-        border-color: rgba(184, 86, 42, 0.45);
-        box-shadow: 0 0 0 4px rgba(184, 86, 42, 0.08);
-      }
-
-      .composer textarea[readonly] {
-        background: #f7f3ea;
-      }
-
-      .helper {
-        margin-top: 10px;
-        color: var(--muted);
-        font-size: 12px;
-      }
-
-      .side-panel {
-        padding: 22px 20px;
-        background: rgba(249, 245, 236, 0.8);
-      }
-
-      .card {
-        padding: 16px;
-        border-radius: 18px;
-        background: #fffdf8;
-        border: 1px solid #e7dfd0;
-      }
-
-      .card + .card {
-        margin-top: 14px;
-      }
-
-      .card-title {
-        margin: 0 0 10px;
-        font-size: 13px;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: var(--muted);
-      }
-
-      .metric {
-        font-size: 20px;
-        font-weight: 700;
-      }
-
-      .status-list,
-      .created-result {
-        margin: 0;
-        padding-left: 18px;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.7;
-      }
-
-      .status-empty {
-        margin: 0;
-        color: var(--muted);
-        font-size: 13px;
-      }
-
-      @media (max-width: 840px) {
-        .body {
-          grid-template-columns: 1fr;
-        }
-
-        .chat-panel {
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
-        }
-
-        .header {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .controls {
-          justify-content: space-between;
-          flex-wrap: wrap;
-        }
-
-        .message {
-          max-width: 100%;
-        }
-
-        .quick-fill-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="page">
-      <div class="shell">
-        <div class="header">
-          <div>
-            <h1 class="title">经销商 Agent 联调页</h1>
-            <p class="subtitle">单页聊天框，直接调用当前 FastAPI chat 接口做端到端联调。</p>
-          </div>
-          <div class="controls">
-            <div class="session-pill" id="sessionPill"></div>
-            <button class="button button-secondary" id="newSessionButton" type="button">新建会话</button>
-          </div>
-        </div>
-
-        <div class="body">
-          <section class="chat-panel">
-            <div class="messages" id="messages"></div>
-            <div class="composer">
-              <div class="quick-fill" id="quickFillPanel" hidden>
-                <p class="quick-fill-title">快捷补充（标准值）</p>
-                <div class="quick-fill-grid" id="quickFillGrid"></div>
-                <div class="quick-fill-actions">
-                  <button class="button button-secondary" id="quickFillButton" type="button">提交选择</button>
-                </div>
-              </div>
-              <div class="address-panel" id="addressPanel" hidden>
-                <p class="quick-fill-title">地址确认</p>
-                <p class="address-message" id="addressMessage"></p>
-                <div class="address-candidate-list" id="addressCandidateList"></div>
-                <div class="address-manual">
-                  <input
-                    id="addressManualInput"
-                    type="text"
-                    placeholder="手工输入详细地址，例如：上海市浦东新区张江高科技园区碧波路888号"
-                  />
-                  <button class="button button-secondary" id="addressManualButton" type="button">检索地址</button>
-                </div>
-                <div class="address-actions">
-                  <button class="button button-secondary" id="addressUseCurrentButton" type="button">使用当前位置</button>
-                  <button class="button button-secondary" id="addressSkipButton" type="button">跳过本次</button>
-                </div>
-              </div>
-              <div class="voice-toolbar">
-                <div class="voice-actions">
-                  <button class="button button-secondary" id="startRecordingButton" type="button">开始录音</button>
-                  <button class="button button-secondary" id="stopRecordingButton" type="button" disabled>停止录音</button>
-                </div>
-                <div class="voice-status" id="voiceStatus">语音未启动</div>
-              </div>
-              <div class="composer-row">
-                <textarea
-                  id="messageInput"
-                  placeholder="例如：新增一个二级经销商，名称叫智行汽车，ERP编码是HZ001，客户邮箱是zhixing@example.com。"
-                ></textarea>
-                <button class="button button-primary" id="sendButton" type="button">发送</button>
-              </div>
-              <div class="helper">语音会实时转写到输入框，销售确认后再发送。按 Enter 发送，Shift + Enter 换行。</div>
-            </div>
-          </section>
-
-          <aside class="side-panel">
-            <div class="card">
-              <h2 class="card-title">当前阶段</h2>
-              <div class="metric" id="stageMetric">collecting</div>
-            </div>
-
-            <div class="card">
-              <h2 class="card-title">缺失字段</h2>
-              <ul class="status-list" id="missingFieldsList"></ul>
-              <p class="status-empty" id="missingFieldsEmpty" hidden>当前没有缺失字段。</p>
-            </div>
-
-            <div class="card">
-              <h2 class="card-title">创建结果</h2>
-              <ul class="created-result" id="createdResultList"></ul>
-              <p class="status-empty" id="createdResultEmpty">当前还没有创建结果。</p>
-            </div>
-          </aside>
-        </div>
-      </div>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>经销商 Agent 联调页</title>
+<style>
+:root {
+  --bg: #f7f9fc;
+  --panel: #ffffff;
+  --ink: #1d2a36;
+  --muted: #66727d;
+  --line: #dde6f7;
+  --brand: #246bff;
+  --brand-soft: #eef4ff;
+  --accent: #b8562a;
+  --accent-soft: #f3e1d7;
+  --user: #1d2a36;
+  --agent-bg: #ffffff;
+  --shadow: 0 10px 24px rgba(17,24,39,0.06);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at top right, rgba(36,107,255,0.08), transparent 24%),
+    linear-gradient(180deg, #eff4ff 0%, var(--bg) 38%, #f7f9fc 100%);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+}
+
+/* ===== Welcome Hero ===== */
+.welcome-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 60px 20px 40px;
+  text-align: center;
+}
+.welcome-hero-icon { font-size: 56px; margin-bottom: 16px; }
+.welcome-hero-title { font-size: 28px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.03em; }
+.welcome-hero-subtitle { font-size: 15px; color: var(--muted); margin: 0 0 32px; max-width: 400px; line-height: 1.6; }
+.hero-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 480px;
+}
+.hero-suggestion {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+.hero-suggestion:hover { background: #dce8ff; transform: translateY(-1px); }
+
+/* ===== Chat Topbar ===== */
+.chat-topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  gap: 12px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-icon { font-size: 24px; }
+.topbar-title { font-size: 16px; font-weight: 600; }
+.topbar-badge { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); }
+.session-pill { font-size: 11px; color: var(--muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.button {
+  border: 0; border-radius: 999px; padding: 8px 14px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+.button:hover { transform: translateY(-1px); }
+.button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.button-secondary { background: #e7dfd0; color: var(--ink); }
+.button-primary { background: var(--brand); color: #fff; }
+.button-outline { background: transparent; border: 1px solid var(--line); color: var(--ink); }
+.new-session-btn { font-size: 12px; padding: 6px 12px; }
+
+/* ===== Messages ===== */
+.chat-messages-wrap {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+}
+.messages {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+.message { display: flex; flex-direction: column; gap: 4px; max-width: 92%; }
+.message-user { align-self: flex-end; }
+.message-agent, .message-system { align-self: flex-start; }
+.message-label { font-size: 11px; color: var(--muted); }
+.message-bubble {
+  border-radius: 18px; padding: 12px 16px;
+  font-size: 14px; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-word;
+}
+.message-user .message-bubble { background: var(--user); color: #fff; border-bottom-right-radius: 6px; }
+.message-agent .message-bubble { background: var(--agent-bg); border: 1px solid #e7dfd0; border-bottom-left-radius: 6px; }
+.message-system .message-bubble { background: var(--accent-soft); color: #6e3a20; border-bottom-left-radius: 6px; }
+
+/* ===== Agent Inline Cards ===== */
+.agent-inline-card {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  margin-top: 4px;
+}
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.card-pill {
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+  background: var(--brand-soft); color: var(--brand);
+}
+.card-title-text { font-size: 14px; font-weight: 600; }
+.card-field-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.card-field { display: flex; flex-direction: column; gap: 4px; }
+.card-field-label { font-size: 12px; color: var(--muted); }
+.card-field select,
+.card-field input,
+.card-field textarea {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #cfdbf1; border-radius: 14px;
+  font: inherit; font-size: 13px;
+  background: #fbfdff; color: var(--ink);
+  transition: border-color 0.2s;
+}
+.card-field select:focus,
+.card-field input:focus,
+.card-field textarea:focus {
+  outline: none; border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(36,107,255,0.1);
+}
+.card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.card-candidates { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.candidate-item {
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 16px;
+  cursor: pointer; transition: border-color 0.2s, background 0.2s;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.candidate-item:hover { border-color: var(--brand); background: var(--brand-soft); }
+.candidate-name { font-size: 13px; font-weight: 600; }
+.candidate-meta { font-size: 12px; color: var(--muted); }
+.candidate-select-btn { padding: 6px 12px; font-size: 12px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); border: 0; cursor: pointer; font-weight: 600; }
+.candidate-select-btn:hover { background: var(--brand); color: #fff; }
+
+/* Quick Fill (inline card variant) */
+.quick-fill-card { }
+.quick-fill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.quick-fill-field { display: flex; flex-direction: column; gap: 4px; }
+.quick-fill-label { font-size: 12px; color: var(--muted); }
+.quick-fill-field select,
+.quick-fill-field input {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #cfdbf1; border-radius: 14px;
+  font: inherit; font-size: 13px;
+  background: #fbfdff; color: var(--ink);
+}
+
+/* Address panel */
+.address-message { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.address-candidate { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.address-candidate-name { font-size: 13px; font-weight: 600; margin: 0 0 4px; }
+.address-candidate-text { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+.address-manual { display: flex; gap: 10px; align-items: center; margin: 12px 0; }
+.address-manual input {
+  flex: 1; padding: 10px 12px;
+  border: 1px solid #cfdbf1; border-radius: 14px;
+  font: inherit; font-size: 13px;
+}
+
+/* ===== Voice Bar (bottom) ===== */
+.voice-bar {
+  flex-shrink: 0;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.voice-bar-row {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; max-width: 800px;
+}
+.voice-bar-input {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: #f7f9fc;
+  border: 1px solid var(--line); border-radius: 24px;
+}
+.voice-bar-input input {
+  flex: 1; border: 0; outline: none; background: transparent;
+  font: inherit; font-size: 14px; color: var(--ink);
+}
+.voice-bar-input input::placeholder { color: #aab5c0; }
+.voice-main-btn {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 0; background: var(--brand); color: #fff;
+  font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.voice-main-btn.recording { background: #e53e3e; animation: pulse 1.5s infinite; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229,62,62,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(229,62,62,0); }
+}
+.voice-status { font-size: 11px; color: var(--muted); text-align: center; }
+.voice-toggle-btn {
+  border: 0; background: transparent; color: var(--muted);
+  font-size: 13px; cursor: pointer; padding: 4px 8px;
+}
+
+/* ===== chat-active state ===== */
+body.chat-active .welcome-hero { display: none; }
+body.chat-active .chat-topbar { display: flex; }
+body.chat-active .chat-messages-wrap { display: block; }
+
+/* Side info cards (compact, in messages) */
+.side-info { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.side-card { padding: 8px 14px; border-radius: 12px; background: #f0f4ff; font-size: 12px; color: var(--ink); }
+.side-card strong { color: var(--brand); }
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .messages { padding: 12px; }
+  .agent-inline-card { border-radius: 18px; padding: 14px; }
+  .card-field-list, .quick-fill-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <!-- Welcome Hero -->
+  <div class="welcome-hero">
+    <div class="welcome-hero-icon">🤖</div>
+    <h1 class="welcome-hero-title">经销商资料录入助手</h1>
+    <p class="welcome-hero-subtitle">你来说，我来整理。支持语音输入，自动识别主体信息、联系人、地址并完成创建前校验。</p>
+    <div class="hero-suggestions">
+      <button class="hero-suggestion" data-text="新增经销商，经销商叫上海契胜科技有限公司，主营类目是汽车用品">新增经销商示例</button>
+      <button class="hero-suggestion" data-text="帮我录一个经销商，浙江博远汽车销售服务有限公司，门店在杭州市拱墅区石祥路333号">含地址示例</button>
+      <button class="hero-suggestion" data-text="补充经销商联系人信息">补充联系人</button>
     </div>
-
-    <script>
-      const sessionPill = document.getElementById("sessionPill");
-      const messages = document.getElementById("messages");
-      const messageInput = document.getElementById("messageInput");
-      const sendButton = document.getElementById("sendButton");
-      const newSessionButton = document.getElementById("newSessionButton");
-      const quickFillPanel = document.getElementById("quickFillPanel");
-      const quickFillGrid = document.getElementById("quickFillGrid");
-      const quickFillButton = document.getElementById("quickFillButton");
-      const addressPanel = document.getElementById("addressPanel");
-      const addressMessage = document.getElementById("addressMessage");
-      const addressCandidateList = document.getElementById("addressCandidateList");
-      const addressManualInput = document.getElementById("addressManualInput");
-      const addressManualButton = document.getElementById("addressManualButton");
-      const addressUseCurrentButton = document.getElementById("addressUseCurrentButton");
-      const addressSkipButton = document.getElementById("addressSkipButton");
-      const startRecordingButton = document.getElementById("startRecordingButton");
-      const stopRecordingButton = document.getElementById("stopRecordingButton");
-      const voiceStatus = document.getElementById("voiceStatus");
-      const stageMetric = document.getElementById("stageMetric");
-      const missingFieldsList = document.getElementById("missingFieldsList");
-      const missingFieldsEmpty = document.getElementById("missingFieldsEmpty");
-      const createdResultList = document.getElementById("createdResultList");
-      const createdResultEmpty = document.getElementById("createdResultEmpty");
-
-      let sessionId = "";
-      let sending = false;
-      let currentMissingFields = [];
-      let fieldOptions = {};
-      let quickFillDraft = {};
-      let currentAddressConfirmation = null;
-      let recording = false;
-      let awaitingAsrFinish = false;
-      let asrSocket = null;
-      let asrStream = null;
-      let asrAudioContext = null;
-      let asrSourceNode = null;
-      let asrProcessorNode = null;
-      let asrInputPrefix = "";
-      let asrTranscript = "";
-      let asrPreview = "";
-
-      function createSessionId() {
-        if (window.crypto && typeof window.crypto.randomUUID === "function") {
-          return `web-${window.crypto.randomUUID()}`;
-        }
-        return `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      }
-
-      function resetSession() {
-        sessionId = createSessionId();
-        sessionPill.textContent = `会话: ${sessionId}`;
-        messages.innerHTML = "";
-        stageMetric.textContent = "collecting";
-        renderMissingFields([]);
-        renderCreatedResult(null);
-        renderQuickFill([]);
-        renderAddressConfirmation(null);
-        quickFillDraft = {};
-        appendMessage(
-          "system",
-          `已新建会话。\n你现在可以直接输入自然语言，也可以在下方枚举面板里补充标准字段。`
-        );
-        messageInput.value = "";
-        asrInputPrefix = "";
-        asrTranscript = "";
-        asrPreview = "";
-        setVoiceStatus("语音未启动");
-        messageInput.focus();
-      }
-
-      function appendMessage(role, text) {
-        const wrapper = document.createElement("div");
-        wrapper.className = `message message-${role}`;
-
-        const label = document.createElement("div");
-        label.className = "message-label";
-        label.textContent = role === "user" ? "你" : role === "agent" ? "Agent" : "系统";
-
-        const bubble = document.createElement("div");
-        bubble.className = "message-bubble";
-        bubble.textContent = text;
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(bubble);
-        messages.appendChild(wrapper);
-        messages.scrollTop = messages.scrollHeight;
-      }
-
-      function renderMissingFields(fields) {
-        currentMissingFields = fields || [];
-        missingFieldsList.innerHTML = "";
-        if (!currentMissingFields || currentMissingFields.length === 0) {
-          missingFieldsEmpty.hidden = false;
-          renderQuickFill([]);
-          return;
-        }
-
-        missingFieldsEmpty.hidden = true;
-        currentMissingFields.forEach((field) => {
-          const item = document.createElement("li");
-          item.textContent = field;
-          missingFieldsList.appendChild(item);
-        });
-        renderQuickFill(currentMissingFields);
-      }
-
-      function renderCreatedResult(createdResult) {
-        createdResultList.innerHTML = "";
-        if (!createdResult) {
-          createdResultEmpty.hidden = false;
-          return;
-        }
-
-        createdResultEmpty.hidden = true;
-        Object.entries(createdResult).forEach(([key, value]) => {
-          const item = document.createElement("li");
-          item.textContent = `${key}: ${String(value)}`;
-          createdResultList.appendChild(item);
-        });
-      }
-
-      function renderAddressConfirmation(payload) {
-        currentAddressConfirmation = payload || null;
-        addressCandidateList.innerHTML = "";
-
-        if (!payload || !payload.active) {
-          addressPanel.hidden = true;
-          addressMessage.textContent = "";
-          return;
-        }
-
-        addressPanel.hidden = false;
-        addressMessage.textContent = payload.message || "请继续完成地址确认。";
-
-        if (!addressManualInput.value && payload.pending_full_address) {
-          addressManualInput.value = payload.pending_full_address;
-        }
-
-        (payload.candidates || []).forEach((candidate) => {
-          const wrapper = document.createElement("div");
-          wrapper.className = "address-candidate";
-
-          const name = document.createElement("p");
-          name.className = "address-candidate-name";
-          name.textContent = candidate.name || "地址候选";
-
-          const text = document.createElement("p");
-          text.className = "address-candidate-text";
-          const meta = [candidate.fullAddress];
-          if (candidate.geoSource) {
-            meta.push(`来源 ${candidate.geoSource}`);
-          }
-          if (candidate.confidence) {
-            meta.push(`置信度 ${candidate.confidence}`);
-          }
-          text.textContent = meta.join(" · ");
-
-          const actions = document.createElement("div");
-          actions.className = "address-candidate-actions";
-
-          const confirmButton = document.createElement("button");
-          confirmButton.className = "button button-primary";
-          confirmButton.type = "button";
-          confirmButton.textContent = "确认这个地址";
-          confirmButton.disabled = sending || recording || awaitingAsrFinish;
-          confirmButton.addEventListener("click", () => {
-            sendAddressAction(
-              "confirm_candidate",
-              { candidate_id: candidate.candidate_id },
-              `确认地址：${candidate.fullAddress}`
-            );
-          });
-
-          actions.appendChild(confirmButton);
-          wrapper.appendChild(name);
-          wrapper.appendChild(text);
-          wrapper.appendChild(actions);
-          addressCandidateList.appendChild(wrapper);
-        });
-
-        addressUseCurrentButton.hidden = payload.can_use_current_location === false;
-        addressSkipButton.hidden = payload.can_skip === false;
-      }
-
-      function renderQuickFill(fields) {
-        quickFillGrid.innerHTML = "";
-
-        const structuredFields = (fields || []).filter((field) => fieldOptions[field]);
-        quickFillPanel.hidden = structuredFields.length === 0;
-
-        Object.keys(quickFillDraft).forEach((fieldPath) => {
-          if (!structuredFields.includes(fieldPath)) {
-            delete quickFillDraft[fieldPath];
-          }
-        });
-
-        structuredFields.forEach((fieldPath) => {
-          const config = fieldOptions[fieldPath];
-          const fieldWrapper = document.createElement("div");
-          fieldWrapper.className = "quick-fill-field";
-
-          const label = document.createElement("label");
-          label.className = "quick-fill-label";
-          label.setAttribute("for", buildFieldElementId(fieldPath));
-          label.textContent = config.label;
-
-          const select = document.createElement("select");
-          select.id = buildFieldElementId(fieldPath);
-
-          const placeholder = document.createElement("option");
-          placeholder.value = "";
-          placeholder.textContent = `请选择${config.label}`;
-          select.appendChild(placeholder);
-
-          config.options.forEach((option) => {
-            const element = document.createElement("option");
-            element.value = JSON.stringify(option.value);
-            element.textContent = option.label;
-            select.appendChild(element);
-          });
-
-          if (Object.prototype.hasOwnProperty.call(quickFillDraft, fieldPath)) {
-            select.value = JSON.stringify(quickFillDraft[fieldPath]);
-          }
-
-          select.addEventListener("change", (event) => {
-            const selectedValue = event.target.value;
-            if (!selectedValue) {
-              delete quickFillDraft[fieldPath];
-              return;
-            }
-            quickFillDraft[fieldPath] = JSON.parse(selectedValue);
-          });
-
-          fieldWrapper.appendChild(label);
-          fieldWrapper.appendChild(select);
-          quickFillGrid.appendChild(fieldWrapper);
-        });
-      }
-
-      function buildFieldElementId(fieldPath) {
-        return `quickFill-${fieldPath.replace(/[^a-zA-Z0-9]+/g, "-")}`;
-      }
-
-      function buildStructuredPatch() {
-        const patch = {};
-        Object.entries(quickFillDraft).forEach(([fieldPath, value]) => {
-          setPathValue(patch, fieldPath, value);
-        });
-        return patch;
-      }
-
-      function setPathValue(target, fieldPath, value) {
-        const [section, fieldName] = fieldPath.split(".", 2);
-        if (!section || !fieldName) {
-          return;
-        }
-        const listMatch = section.match(/^([a-zA-Z_]+)\[(\d+)\]$/);
-        if (listMatch) {
-          const [, listName, rawIndex] = listMatch;
-          const index = Number(rawIndex);
-          if (!target[listName]) {
-            target[listName] = [];
-          }
-          if (!target[listName][index]) {
-            target[listName][index] = {};
-          }
-          target[listName][index][fieldName] = value;
-          return;
-        }
-        if (!target[section]) {
-          target[section] = {};
-        }
-        target[section][fieldName] = value;
-      }
-
-      function buildStructuredPreview(patch) {
-        const segments = [];
-        Object.entries(patch.main_info || {}).forEach(([fieldName, value]) => {
-          const fieldPath = `main_info.${fieldName}`;
-          const config = fieldOptions[fieldPath];
-          if (!config) {
-            return;
-          }
-          const selectedOption = config.options.find((option) => option.value === value);
-          const displayValue = selectedOption ? selectedOption.label : String(value);
-          segments.push(`${config.label}=${displayValue}`);
-        });
-        (patch.contacts || []).forEach((contact, index) => {
-          Object.entries(contact).forEach(([fieldName, value]) => {
-            const fieldPath = `contacts[${index}].${fieldName}`;
-            const fallbackFieldPath = `contacts[0].${fieldName}`;
-            const config = fieldOptions[fieldPath] || fieldOptions[fallbackFieldPath];
-            if (!config) {
-              return;
-            }
-            const selectedOption = config.options.find((option) => option.value === value);
-            const displayValue = selectedOption ? selectedOption.label : String(value);
-            segments.push(`${config.label}=${displayValue}`);
-          });
-        });
-        return segments.join("，");
-      }
-
-      function updateControls() {
-        const busy = sending || recording || awaitingAsrFinish;
-        sendButton.disabled = busy;
-        quickFillButton.disabled = busy;
-        newSessionButton.disabled = busy;
-        addressManualButton.disabled = busy;
-        addressUseCurrentButton.disabled = busy;
-        addressSkipButton.disabled = busy;
-        startRecordingButton.disabled = busy;
-        stopRecordingButton.disabled = !recording || awaitingAsrFinish;
-        messageInput.readOnly = recording || awaitingAsrFinish;
-        addressManualInput.readOnly = busy;
-      }
-
-      function setSending(nextSending) {
-        sending = nextSending;
-        updateControls();
-      }
-
-      function setVoiceStatus(text) {
-        voiceStatus.textContent = text;
-      }
-
-      function buildAsrWebSocketUrl() {
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        return `${protocol}//${window.location.host}/api/agent/distributors/asr/realtime`;
-      }
-
-      function composeAsrDraft() {
-        const transcriptBlock = `${asrTranscript}${asrPreview}`.trim();
-        if (!asrInputPrefix) {
-          return transcriptBlock;
-        }
-        if (!transcriptBlock) {
-          return asrInputPrefix;
-        }
-        return `${asrInputPrefix}\n${transcriptBlock}`;
-      }
-
-      function refreshAsrDraft() {
-        messageInput.value = composeAsrDraft();
-      }
-
-      function cleanupRecordingResources() {
-        if (asrProcessorNode) {
-          asrProcessorNode.disconnect();
-          asrProcessorNode.onaudioprocess = null;
-          asrProcessorNode = null;
-        }
-        if (asrSourceNode) {
-          asrSourceNode.disconnect();
-          asrSourceNode = null;
-        }
-        if (asrStream) {
-          asrStream.getTracks().forEach((track) => track.stop());
-          asrStream = null;
-        }
-        if (asrAudioContext) {
-          asrAudioContext.close();
-          asrAudioContext = null;
-        }
-      }
-
-      function finishRecording(statusText) {
-        cleanupRecordingResources();
-        recording = false;
-        awaitingAsrFinish = false;
-        asrSocket = null;
-        updateControls();
-        setVoiceStatus(statusText);
-      }
-
-      async function startMicrophoneStreaming() {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        asrAudioContext = new AudioContextClass();
-        await asrAudioContext.resume();
-        asrSourceNode = asrAudioContext.createMediaStreamSource(asrStream);
-        asrProcessorNode = asrAudioContext.createScriptProcessor(4096, 1, 1);
-        asrProcessorNode.onaudioprocess = (event) => {
-          if (!asrSocket || asrSocket.readyState !== WebSocket.OPEN || awaitingAsrFinish) {
-            return;
-          }
-          const channelData = event.inputBuffer.getChannelData(0);
-          const pcmBuffer = downsampleTo16kHz(channelData, asrAudioContext.sampleRate);
-          if (pcmBuffer.byteLength > 0) {
-            asrSocket.send(pcmBuffer);
-          }
-        };
-        asrSourceNode.connect(asrProcessorNode);
-        asrProcessorNode.connect(asrAudioContext.destination);
-      }
-
-      function downsampleTo16kHz(buffer, inputSampleRate) {
-        if (!buffer || buffer.length === 0) {
-          return new ArrayBuffer(0);
-        }
-
-        const targetSampleRate = 16000;
-        if (inputSampleRate === targetSampleRate) {
-          return float32ToPcm16(buffer).buffer;
-        }
-
-        const ratio = inputSampleRate / targetSampleRate;
-        const resultLength = Math.round(buffer.length / ratio);
-        const result = new Int16Array(resultLength);
-        let offsetResult = 0;
-        let offsetBuffer = 0;
-
-        while (offsetResult < result.length) {
-          const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
-          let sum = 0;
-          let count = 0;
-          for (let index = offsetBuffer; index < nextOffsetBuffer && index < buffer.length; index += 1) {
-            sum += buffer[index];
-            count += 1;
-          }
-          const sample = count > 0 ? sum / count : 0;
-          const clamped = Math.max(-1, Math.min(1, sample));
-          result[offsetResult] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
-          offsetResult += 1;
-          offsetBuffer = nextOffsetBuffer;
-        }
-
-        return result.buffer;
-      }
-
-      function float32ToPcm16(buffer) {
-        const result = new Int16Array(buffer.length);
-        for (let index = 0; index < buffer.length; index += 1) {
-          const sample = Math.max(-1, Math.min(1, buffer[index]));
-          result[index] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
-        }
-        return result;
-      }
-
-      async function startRecording() {
-        if (sending || recording || awaitingAsrFinish) {
-          return;
-        }
-
-        try {
-          setVoiceStatus("正在请求麦克风权限...");
-          asrStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-              channelCount: 1,
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true,
-            },
-          });
-        } catch (error) {
-          setVoiceStatus("麦克风权限失败");
-          appendMessage("system", `无法开始录音：${error.message}`);
-          return;
-        }
-
-        asrInputPrefix = messageInput.value.trim();
-        asrTranscript = "";
-        asrPreview = "";
-        recording = true;
-        awaitingAsrFinish = false;
-        updateControls();
-        setVoiceStatus("正在连接实时语音识别...");
-
-        asrSocket = new WebSocket(buildAsrWebSocketUrl());
-        asrSocket.binaryType = "arraybuffer";
-
-        asrSocket.addEventListener("open", () => {
-          asrSocket.send(JSON.stringify({ type: "start" }));
-        });
-
-        asrSocket.addEventListener("message", async (event) => {
-          const payload = JSON.parse(event.data);
-          if (payload.type === "starting") {
-            setVoiceStatus("语音识别会话初始化中...");
-            return;
-          }
-          if (payload.type === "ready") {
-            setVoiceStatus("录音中，文字将实时回填输入框");
-            await startMicrophoneStreaming();
-            return;
-          }
-          if (payload.type === "partial") {
-            asrTranscript = payload.text || "";
-            asrPreview = payload.stash || "";
-            refreshAsrDraft();
-            return;
-          }
-          if (payload.type === "final") {
-            asrTranscript = payload.text || "";
-            asrPreview = "";
-            refreshAsrDraft();
-            return;
-          }
-          if (payload.type === "finished") {
-            finishRecording("识别完成，请检查后发送");
-            return;
-          }
-          if (payload.type === "error") {
-            appendMessage("system", `语音识别失败：${payload.message || "未知错误"}`);
-            finishRecording("语音识别失败");
-          }
-        });
-
-        asrSocket.addEventListener("close", () => {
-          if (recording || awaitingAsrFinish) {
-            finishRecording("语音会话已关闭");
-          }
-        });
-
-        asrSocket.addEventListener("error", () => {
-          appendMessage("system", "实时语音识别连接异常。");
-          finishRecording("语音识别连接异常");
-        });
-      }
-
-      function stopRecording() {
-        if (!recording || awaitingAsrFinish || !asrSocket || asrSocket.readyState !== WebSocket.OPEN) {
-          return;
-        }
-
-        awaitingAsrFinish = true;
-        cleanupRecordingResources();
-        updateControls();
-        setVoiceStatus("正在结束录音并等待最终文本...");
-        asrSocket.send(JSON.stringify({ type: "stop" }));
-      }
-
-      async function sendMessage(rawText) {
-        const text = (rawText ?? messageInput.value).trim();
-        if (!text || sending || recording || awaitingAsrFinish) {
-          return;
-        }
-
-        setSending(true);
-
-        appendMessage("user", text);
-        if (rawText === undefined) {
-          messageInput.value = "";
-        }
-
-        try {
-          const response = await fetch("/api/agent/distributors/chat", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              session_id: sessionId,
-              message: text,
-            }),
-          });
-
-          if (!response.ok) {
-            const fallbackText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
-          }
-
-          const payload = await response.json();
-          appendMessage("agent", payload.reply || "接口返回为空");
-          stageMetric.textContent = payload.stage || "unknown";
-          renderMissingFields(payload.missing_required_fields || []);
-          renderCreatedResult(payload.created_result || null);
-          renderAddressConfirmation(payload.address_confirmation || null);
-        } catch (error) {
-          appendMessage("system", `请求失败：${error.message}`);
-        } finally {
-          setSending(false);
-          messageInput.focus();
-        }
-      }
-
-      async function sendAddressAction(action, extraPayload = {}, userText = "") {
-        if (sending || recording || awaitingAsrFinish) {
-          return;
-        }
-
-        setSending(true);
-        if (userText) {
-          appendMessage("user", userText);
-        }
-
-        try {
-          const response = await fetch("/api/agent/distributors/address/resolve", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              session_id: sessionId,
-              action,
-              ...extraPayload,
-            }),
-          });
-
-          if (!response.ok) {
-            const fallbackText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
-          }
-
-          const payload = await response.json();
-          appendMessage("agent", payload.suggested_reply || payload.message || "地址确认已更新");
-          if (payload.stage) {
-            stageMetric.textContent = payload.stage;
-          }
-          if (payload.missing_required_fields) {
-            renderMissingFields(payload.missing_required_fields);
-          }
-          renderAddressConfirmation(payload.address_confirmation || null);
-          if (!payload.address_confirmation) {
-            addressManualInput.value = "";
-          }
-        } catch (error) {
-          appendMessage("system", `请求失败：${error.message}`);
-        } finally {
-          setSending(false);
-          messageInput.focus();
-        }
-      }
-
-      function requestCurrentLocationForAddress() {
-        if (!navigator.geolocation) {
-          appendMessage("system", "当前浏览器不支持地理定位。");
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            sendAddressAction(
-              "use_current_location",
-              {
-                current_location: {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                  accuracyMeters: position.coords.accuracy || null,
-                },
-              },
-              "使用当前位置确认地址"
-            );
-          },
-          (error) => {
-            appendMessage("system", `无法获取当前位置：${error.message}`);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          }
-        );
-      }
-
-      async function sendStructuredFields() {
-        if (sending || recording || awaitingAsrFinish) {
-          return;
-        }
-
-        const patch = buildStructuredPatch();
-        const hasMainInfo = patch.main_info && Object.keys(patch.main_info).length > 0;
-        const hasContacts =
-          Array.isArray(patch.contacts) &&
-          patch.contacts.some((contact) => Object.keys(contact || {}).length > 0);
-        if (!hasMainInfo && !hasContacts) {
-          appendMessage("system", "请先选择至少一个标准字段。");
-          return;
-        }
-
-        setSending(true);
-        appendMessage("user", `结构化补充：${buildStructuredPreview(patch)}`);
-
-        try {
-          const response = await fetch("/api/agent/distributors/fields", {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              session_id: sessionId,
-              patch,
-            }),
-          });
-
-          if (!response.ok) {
-            const fallbackText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
-          }
-
-          const payload = await response.json();
-          quickFillDraft = {};
-          appendMessage("agent", payload.reply || "接口返回为空");
-          stageMetric.textContent = payload.stage || "unknown";
-          renderMissingFields(payload.missing_required_fields || []);
-          renderCreatedResult(payload.created_result || null);
-        } catch (error) {
-          appendMessage("system", `请求失败：${error.message}`);
-        } finally {
-          setSending(false);
-          messageInput.focus();
-        }
-      }
-
-      async function loadFieldOptions() {
-        try {
-          const response = await fetch("/api/agent/distributors/field-options");
-          if (!response.ok) {
-            const fallbackText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${fallbackText}`);
-          }
-          const payload = await response.json();
-          fieldOptions = payload.fields || {};
-          renderQuickFill(currentMissingFields);
-        } catch (error) {
-          appendMessage("system", `枚举字段加载失败：${error.message}`);
-        }
-      }
-
-      sendButton.addEventListener("click", sendMessage);
-      quickFillButton.addEventListener("click", sendStructuredFields);
-      addressManualButton.addEventListener("click", () => {
-        const fullAddress = addressManualInput.value.trim();
-        if (!fullAddress) {
-          appendMessage("system", "请先输入详细地址。");
-          return;
-        }
-        sendAddressAction("resolve_text", { full_address: fullAddress }, `手工输入地址：${fullAddress}`);
+  </div>
+
+  <!-- Chat Topbar (hidden initially) -->
+  <div class="chat-topbar" id="chatTopbar">
+    <div class="topbar-left">
+      <span class="topbar-icon">🤖</span>
+      <span class="topbar-title">经销商资料录入</span>
+      <span class="topbar-badge" id="stagePill">录入中</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="session-pill" id="sessionPill"></span>
+      <button class="button button-outline new-session-btn" id="newSessionButton">新建会话</button>
+    </div>
+  </div>
+
+  <!-- Messages wrap -->
+  <div class="chat-messages-wrap">
+    <div class="messages" id="messages"></div>
+  </div>
+
+  <!-- Voice Bar -->
+  <div class="voice-bar">
+    <div class="voice-bar-row">
+      <div class="voice-bar-input">
+        <input type="text" id="messageInput" placeholder="输入消息，或点击麦克风语音输入..." autofocus/>
+        <button class="button button-primary" id="sendButton">发送</button>
+      </div>
+      <button class="voice-main-btn" id="micButton" title="开始/停止录音">🎤</button>
+    </div>
+    <div class="voice-status" id="voiceStatus">语音未启动</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="voice-toggle-btn" id="newSessionBtn2">🔄 新会话</button>
+    </div>
+  </div>
+</body>
+
+<script>
+(function() {
+  // ===== State =====
+  let sessionId = "";
+  let sending = false;
+  let currentMissingFields = [];
+  let quickFillDraft = {};
+  let fieldOptions = {};
+  let currentAddressConfirmation = null;
+
+  // ASR
+  let recording = false;
+  let awaitingAsrFinish = false;
+  let asrSocket = null;
+  let asrStream = null;
+  let asrAudioContext = null;
+  let asrSourceNode = null;
+  let asrProcessorNode = null;
+  let asrInputPrefix = "";
+  let asrTranscript = "";
+  let asrPreview = "";
+
+  // ===== DOM refs =====
+  const messages = document.getElementById("messages");
+  const messageInput = document.getElementById("messageInput");
+  const sendButton = document.getElementById("sendButton");
+  const micButton = document.getElementById("micButton");
+  const voiceStatus = document.getElementById("voiceStatus");
+  const sessionPill = document.getElementById("sessionPill");
+  const stagePill = document.getElementById("stagePill");
+  const newSessionButton = document.getElementById("newSessionButton");
+  const newSessionBtn2 = document.getElementById("newSessionBtn2");
+  const chatTopbar = document.getElementById("chatTopbar");
+
+  // ===== Sessions =====
+  function makeSessionId() {
+    if (window.crypto && window.crypto.randomUUID) return "web-" + window.crypto.randomUUID();
+    return "web-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  }
+
+  function resetSession() {
+    sessionId = makeSessionId();
+    sessionPill.textContent = "会话: " + sessionId.slice(0, 18) + "...";
+    messages.innerHTML = "";
+    currentMissingFields = [];
+    quickFillDraft = {};
+    currentAddressConfirmation = null;
+    messageInput.value = "";
+    asrInputPrefix = "";
+    asrTranscript = "";
+    asrPreview = "";
+    stagePill.textContent = "录入中";
+    document.body.classList.remove("chat-active");
+    setVoiceStatus("语音未启动");
+    messageInput.focus();
+  }
+
+  // ===== Messages =====
+  function appendMessage(role, text) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message message-" + role;
+    const label = document.createElement("div");
+    label.className = "message-label";
+    label.textContent = role === "user" ? "你" : role === "agent" ? "助手" : "系统";
+    const bubble = document.createElement("div");
+    bubble.className = "message-bubble";
+    bubble.textContent = text;
+    wrapper.appendChild(label);
+    wrapper.appendChild(bubble);
+    messages.appendChild(wrapper);
+    messages.parentElement.scrollTop = messages.parentElement.scrollHeight;
+  }
+
+  function enterChatMode() {
+    document.body.classList.add("chat-active");
+  }
+
+  // ===== Inline Cards =====
+  function appendCard(cardEl) {
+    messages.appendChild(cardEl);
+    messages.parentElement.scrollTop = messages.parentElement.scrollHeight;
+  }
+
+  function removeOldCards() {
+    messages.querySelectorAll(".agent-inline-card").forEach(function(c) { c.remove(); });
+  }
+
+  function renderEnumCard(fields) {
+    removeOldCards();
+    if (!fields || fields.length === 0) return;
+    var structFields = fields.filter(function(f) { return fieldOptions[f]; });
+    if (structFields.length === 0) return;
+
+    var card = document.createElement("div");
+    card.className = "agent-inline-card quick-fill-card";
+    card.id = "enumCard";
+
+    var header = document.createElement("div");
+    header.className = "card-header";
+    var pill = document.createElement("span");
+    pill.className = "card-pill"; pill.textContent = "待补充";
+    var title = document.createElement("span");
+    title.className = "card-title-text"; title.textContent = "枚举字段补充";
+    header.appendChild(pill);
+    header.appendChild(title);
+    card.appendChild(header);
+
+    var grid = document.createElement("div");
+    grid.className = "quick-fill-grid";
+
+    Object.keys(quickFillDraft).forEach(function(k) {
+      if (structFields.indexOf(k) === -1) delete quickFillDraft[k];
+    });
+
+    structFields.forEach(function(fieldPath) {
+      var config = fieldOptions[fieldPath];
+      if (!config) return;
+      var fieldDiv = document.createElement("div");
+      fieldDiv.className = "quick-fill-field";
+      var lbl = document.createElement("label");
+      lbl.className = "quick-fill-label";
+      lbl.textContent = config.label;
+      var sel = document.createElement("select");
+      var ph = document.createElement("option"); ph.value = ""; ph.textContent = "请选择" + config.label;
+      sel.appendChild(ph);
+      config.options.forEach(function(opt) {
+        var o = document.createElement("option");
+        o.value = JSON.stringify(opt.value);
+        o.textContent = opt.label;
+        sel.appendChild(o);
       });
-      addressUseCurrentButton.addEventListener("click", requestCurrentLocationForAddress);
-      addressSkipButton.addEventListener("click", () => {
+      if (Object.prototype.hasOwnProperty.call(quickFillDraft, fieldPath)) {
+        sel.value = JSON.stringify(quickFillDraft[fieldPath]);
+      }
+      sel.addEventListener("change", function(evt) {
+        var v = evt.target.value;
+        if (!v) { delete quickFillDraft[fieldPath]; return; }
+        quickFillDraft[fieldPath] = JSON.parse(v);
+      });
+      fieldDiv.appendChild(lbl); fieldDiv.appendChild(sel);
+      grid.appendChild(fieldDiv);
+    });
+    card.appendChild(grid);
+
+    var actions = document.createElement("div");
+    actions.className = "card-actions";
+    var btn = document.createElement("button");
+    btn.className = "button button-primary";
+    btn.textContent = "确认这些字段";
+    btn.addEventListener("click", sendStructuredFields);
+    var skip = document.createElement("button");
+    skip.className = "button button-outline";
+    skip.textContent = "跳过";
+    skip.addEventListener("click", function() {
+      removeOldCards();
+      quickFillDraft = {};
+    });
+    actions.appendChild(btn); actions.appendChild(skip);
+    card.appendChild(actions);
+    appendCard(card);
+  }
+
+  // Build structured patch from quickFillDraft
+  function setPathValue(target, fieldPath, value) {
+    var parts = fieldPath.split(".", 2);
+    var section = parts[0], fieldName = parts[1];
+    if (!section || !fieldName) return;
+    var m = section.match(/^([a-zA-Z_]+)\[(\d+)\]$/);
+    if (m) {
+      var listName = m[1], idx = Number(m[2]);
+      if (!target[listName]) target[listName] = [];
+      if (!target[listName][idx]) target[listName][idx] = {};
+      target[listName][idx][fieldName] = value;
+    } else {
+      if (!target[section]) target[section] = {};
+      target[section][fieldName] = value;
+    }
+  }
+
+  function buildStructuredPatch() {
+    var patch = {};
+    Object.entries(quickFillDraft).forEach(function(e) { setPathValue(patch, e[0], e[1]); });
+    return patch;
+  }
+
+  function buildStructuredPreview(patch) {
+    var segs = [];
+    Object.entries(patch.main_info || {}).forEach(function(e) {
+      var config = fieldOptions["main_info." + e[0]];
+      if (!config) return;
+      var opt = config.options.find(function(o) { return o.value === e[1]; });
+      segs.push(config.label + "=" + (opt ? opt.label : String(e[1])));
+    });
+    (patch.contacts || []).forEach(function(contact, idx) {
+      Object.entries(contact).forEach(function(e) {
+        var config = fieldOptions["contacts[" + idx + "]." + e[0]] || fieldOptions["contacts[0]." + e[0]];
+        if (!config) return;
+        var opt = config.options.find(function(o) { return o.value === e[1]; });
+        segs.push(config.label + "=" + (opt ? opt.label : String(e[1])));
+      });
+    });
+    return segs.join("，");
+  }
+
+  // Address card
+  function renderAddressCard(payload) {
+    removeOldCards();
+    currentAddressConfirmation = payload || null;
+    if (!payload || !payload.active) return;
+
+    var card = document.createElement("div");
+    card.className = "agent-inline-card";
+    card.id = "addressCard";
+    var header = document.createElement("div");
+    header.className = "card-header";
+    var pill = document.createElement("span");
+    pill.className = "card-pill"; pill.textContent = "待确认";
+    var title = document.createElement("span");
+    title.className = "card-title-text"; title.textContent = "门店地址确认";
+    header.appendChild(pill); header.appendChild(title);
+    card.appendChild(header);
+
+    var msg = document.createElement("p");
+    msg.className = "address-message";
+    msg.textContent = payload.message || "请继续完成地址确认。";
+    card.appendChild(msg);
+
+    if (payload.candidates && payload.candidates.length > 0) {
+      var list = document.createElement("div");
+      list.className = "card-candidates";
+      payload.candidates.forEach(function(candidate) {
+        var item = document.createElement("div");
+        item.className = "candidate-item";
+        var left = document.createElement("div");
+        var name = document.createElement("div");
+        name.className = "candidate-name"; name.textContent = candidate.name || "地址候选";
+        var meta = document.createElement("div");
+        meta.className = "candidate-meta";
+        var parts = [candidate.fullAddress];
+        if (candidate.geoSource) parts.push("来源 " + candidate.geoSource);
+        if (candidate.confidence) parts.push("置信度 " + candidate.confidence);
+        meta.textContent = parts.join(" · ");
+        left.appendChild(name); left.appendChild(meta);
+        var btn = document.createElement("button");
+        btn.className = "candidate-select-btn"; btn.textContent = "选择";
+        btn.addEventListener("click", function() {
+          sendAddressAction("confirm_candidate", {candidate_id: candidate.candidate_id}, "确认地址：" + candidate.fullAddress);
+          card.remove();
+        });
+        item.appendChild(left); item.appendChild(btn);
+        list.appendChild(item);
+      });
+      card.appendChild(list);
+    }
+
+    var manual = document.createElement("div");
+    manual.className = "address-manual";
+    var input = document.createElement("input");
+    input.type = "text"; input.placeholder = "或手动输入详细地址";
+    input.value = payload.pending_full_address || "";
+    var searchBtn = document.createElement("button");
+    searchBtn.className = "button button-secondary"; searchBtn.textContent = "检索";
+    searchBtn.addEventListener("click", function() {
+      var addr = input.value.trim();
+      if (!addr) return;
+      sendAddressAction("resolve_text", {full_address: addr}, "手工输入地址：" + addr);
+      card.remove();
+    });
+    manual.appendChild(input); manual.appendChild(searchBtn);
+    card.appendChild(manual);
+
+    var actions = document.createElement("div");
+    actions.className = "card-actions";
+    if (payload.can_use_current_location !== false) {
+      var locBtn = document.createElement("button");
+      locBtn.className = "button button-outline"; locBtn.textContent = "使用当前位置";
+      locBtn.addEventListener("click", requestCurrentLocationForAddress);
+      actions.appendChild(locBtn);
+    }
+    if (payload.can_skip !== false) {
+      var skipBtn = document.createElement("button");
+      skipBtn.className = "button button-outline"; skipBtn.textContent = "跳过";
+      skipBtn.addEventListener("click", function() {
         sendAddressAction("skip", {}, "先跳过地址确认");
+        card.remove();
       });
-      startRecordingButton.addEventListener("click", startRecording);
-      stopRecordingButton.addEventListener("click", stopRecording);
-      newSessionButton.addEventListener("click", resetSession);
-      messageInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault();
-          sendMessage();
-        }
-      });
-      addressManualInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          addressManualButton.click();
-        }
-      });
+      actions.appendChild(skipBtn);
+    }
+    card.appendChild(actions);
+    appendCard(card);
+  }
 
-      resetSession();
-      updateControls();
-      loadFieldOptions();
-    </script>
-  </body>
+  // ===== API calls =====
+  function setSending(v) { sending = v; updateControls(); }
+  function setVoiceStatus(t) { voiceStatus.textContent = t; }
+  function updateControls() {
+    var busy = sending || recording || awaitingAsrFinish;
+    sendButton.disabled = busy;
+    messageInput.readOnly = recording || awaitingAsrFinish;
+    micButton.disabled = busy && !recording;
+    if (recording) { micButton.classList.add("recording"); micButton.textContent = "⏹"; }
+    else { micButton.classList.remove("recording"); micButton.textContent = "🎤"; }
+  }
+
+  async function sendMessage(rawText) {
+    rawText = (rawText !== undefined) ? rawText : messageInput.value;
+    var text = (rawText || "").trim();
+    if (!text || sending || recording || awaitingAsrFinish) return;
+    setSending(true);
+    enterChatMode();
+    appendMessage("user", text);
+    messageInput.value = "";
+    try {
+      var resp = await fetch("/api/agent/distributors/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({session_id: sessionId, message: text})
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status + ": " + await resp.text());
+      var payload = await resp.json();
+      appendMessage("agent", payload.reply || "接口返回为空");
+      stagePill.textContent = payload.stage || "录入中";
+      renderMissingFields(payload.missing_required_fields || []);
+      renderAddressCard(payload.address_confirmation || null);
+      renderCreatedResult(payload.created_result || null);
+    } catch(e) {
+      appendMessage("system", "请求失败：" + e.message);
+    } finally {
+      setSending(false);
+      messageInput.focus();
+    }
+  }
+
+  async function sendStructuredFields() {
+    if (sending || recording || awaitingAsrFinish) return;
+    var patch = buildStructuredPatch();
+    var hasMain = patch.main_info && Object.keys(patch.main_info).length > 0;
+    var hasContacts = Array.isArray(patch.contacts) && patch.contacts.some(function(c) { return c && Object.keys(c).length > 0; });
+    if (!hasMain && !hasContacts) { appendMessage("system", "请先选择至少一个标准字段。"); return; }
+    setSending(true);
+    appendMessage("user", "结构化补充：" + buildStructuredPreview(patch));
+    try {
+      var resp = await fetch("/api/agent/distributors/fields", {
+        method: "PATCH", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({session_id: sessionId, patch: patch})
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status + ": " + await resp.text());
+      var payload = await resp.json();
+      quickFillDraft = {};
+      appendMessage("agent", payload.reply || "接口返回为空");
+      stagePill.textContent = payload.stage || "录入中";
+      renderMissingFields(payload.missing_required_fields || []);
+      renderAddressCard(payload.address_confirmation || null);
+      renderCreatedResult(payload.created_result || null);
+      removeOldCards();
+    } catch(e) {
+      appendMessage("system", "请求失败：" + e.message);
+    } finally { setSending(false); messageInput.focus(); }
+  }
+
+  async function sendAddressAction(action, extra, userText) {
+    if (sending || recording || awaitingAsrFinish) return;
+    setSending(true);
+    if (userText) appendMessage("user", userText);
+    try {
+      var body = Object.assign({session_id: sessionId, action: action}, extra || {});
+      var resp = await fetch("/api/agent/distributors/address/resolve", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+      });
+      if (!resp.ok) throw new Error("HTTP " + resp.status + ": " + await resp.text());
+      var payload = await resp.json();
+      if (payload.reply) appendMessage("agent", payload.reply);
+      renderAddressCard(payload.address_confirmation || null);
+      renderMissingFields(payload.missing_required_fields || []);
+      renderCreatedResult(payload.created_result || null);
+    } catch(e) {
+      appendMessage("system", "请求失败：" + e.message);
+    } finally { setSending(false); }
+  }
+
+  function requestCurrentLocationForAddress() {
+    if (!navigator.geolocation) { appendMessage("system", "当前浏览器不支持地理定位。"); return; }
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      sendAddressAction("use_current_location", {
+        current_location: {latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracyMeters: pos.coords.accuracy || null}
+      }, "使用当前位置确认地址");
+    }, function(err) {
+      appendMessage("system", "无法获取当前位置：" + err.message);
+    }, {enableHighAccuracy: true, timeout: 10000, maximumAge: 0});
+  }
+
+  function renderMissingFields(fields) {
+    currentMissingFields = fields || [];
+    var toRender = currentMissingFields.filter(function(f) { return fieldOptions[f]; });
+    renderEnumCard(toRender);
+  }
+
+  function renderCreatedResult(result) {
+    // Show inline in messages as a compact info card
+    messages.querySelectorAll(".created-result-card").forEach(function(c) { c.remove(); });
+    if (!result) return;
+    var card = document.createElement("div");
+    card.className = "agent-inline-card created-result-card";
+    var header = document.createElement("div");
+    header.className = "card-header";
+    var pill = document.createElement("span");
+    pill.className = "card-pill"; pill.textContent = "创建结果";
+    var title = document.createElement("span");
+    title.className = "card-title-text"; title.textContent = "经销商创建成功";
+    header.appendChild(pill); header.appendChild(title);
+    card.appendChild(header);
+    var row = document.createElement("div");
+    row.className = "side-info";
+    Object.entries(result).forEach(function(e) {
+      var item = document.createElement("span");
+      item.className = "side-card";
+      item.innerHTML = e[0] + ": <strong>" + String(e[1]) + "</strong>";
+      row.appendChild(item);
+    });
+    card.appendChild(row);
+    appendCard(card);
+  }
+
+  // ===== Field options =====
+  async function loadFieldOptions() {
+    try {
+      var resp = await fetch("/api/agent/distributors/field-options");
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      var payload = await resp.json();
+      fieldOptions = payload.fields || {};
+    } catch(e) { console.warn("字段选项加载失败:", e); }
+  }
+
+  // ===== ASR =====
+  function buildAsrWebSocketUrl() {
+    var proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return proto + "//" + window.location.host + "/api/agent/distributors/asr/realtime";
+  }
+
+  function composeAsrDraft() {
+    var block = (asrTranscript + asrPreview).trim();
+    if (!asrInputPrefix) return block;
+    if (!block) return asrInputPrefix;
+    return asrInputPrefix + "\n" + block;
+  }
+
+  function refreshAsrDraft() { messageInput.value = composeAsrDraft(); }
+
+  function cleanupRecordingResources() {
+    if (asrProcessorNode) { asrProcessorNode.disconnect(); asrProcessorNode.onaudioprocess = null; asrProcessorNode = null; }
+    if (asrSourceNode) { asrSourceNode.disconnect(); asrSourceNode = null; }
+    if (asrStream) { asrStream.getTracks().forEach(function(t) { t.stop(); }); asrStream = null; }
+    if (asrAudioContext) { asrAudioContext.close(); asrAudioContext = null; }
+  }
+
+  function finishRecording(statusText) {
+    if (!recording && !awaitingAsrFinish && !asrSocket) return;
+    cleanupRecordingResources();
+    recording = false;
+    awaitingAsrFinish = false;
+    if (asrSocket) { asrSocket.close(); }
+    asrSocket = null;
+    updateControls();
+    setVoiceStatus(statusText);
+  }
+
+  async function startMicrophoneStreaming() {
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    asrAudioContext = new AudioCtx();
+    await asrAudioContext.resume();
+    asrSourceNode = asrAudioContext.createMediaStreamSource(asrStream);
+    var bufferSize = 4096;
+    asrProcessorNode = asrAudioContext.createScriptProcessor(bufferSize, 1, 1);
+    asrProcessorNode.onaudioprocess = function(evt) {
+      if (!asrSocket || asrSocket.readyState !== WebSocket.OPEN || awaitingAsrFinish) return;
+      var input = evt.inputBuffer.getChannelData(0);
+      var pcm16 = float32ToPcm16(input);
+      var downsampled = downsampleTo16kHz(pcm16, asrAudioContext.sampleRate);
+      var buf = new ArrayBuffer(downsampled.length * 2);
+      var view = new DataView(buf);
+      downsampled.forEach(function(v, i) { view.setInt16(i * 2, v, true); });
+      asrSocket.send(buf);
+    };
+    asrSourceNode.connect(asrProcessorNode);
+    asrProcessorNode.connect(asrAudioContext.destination);
+  }
+
+  function downsampleTo16kHz(buf, inputRate) {
+    if (inputRate <= 16000) return buf;
+    var ratio = inputRate / 16000;
+    var outLen = Math.floor(buf.length / ratio);
+    var out = new Int16Array(outLen);
+    for (var i = 0; i < outLen; i++) {
+      var srcIdx = Math.floor(i * ratio);
+      out[i] = buf[srcIdx];
+    }
+    return out;
+  }
+
+  function float32ToPcm16(buf) {
+    var out = new Int16Array(buf.length);
+    for (var i = 0; i < buf.length; i++) {
+      var s = Math.max(-1, Math.min(1, buf[i]));
+      out[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    }
+    return out;
+  }
+
+  async function startRecording() {
+    if (sending || recording || awaitingAsrFinish) return;
+    try {
+      setVoiceStatus("正在请求麦克风权限...");
+      asrStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    } catch(e) {
+      setVoiceStatus("麦克风权限失败");
+      appendMessage("system", "无法开始录音：" + e.message);
+      return;
+    }
+    asrInputPrefix = messageInput.value.trim();
+    asrTranscript = "";
+    asrPreview = "";
+    recording = true;
+    awaitingAsrFinish = false;
+    updateControls();
+    setVoiceStatus("正在连接实时语音识别...");
+    asrSocket = new WebSocket(buildAsrWebSocketUrl());
+    asrSocket.binaryType = "arraybuffer";
+    asrSocket.addEventListener("open", function() {
+      asrSocket.send(JSON.stringify({type: "start"}));
+    });
+    asrSocket.addEventListener("message", async function(evt) {
+      var payload = JSON.parse(evt.data);
+      if (payload.type === "starting") { setVoiceStatus("语音识别会话初始化中..."); return; }
+      if (payload.type === "ready") { setVoiceStatus("录音中，文字将实时回填输入框"); await startMicrophoneStreaming(); return; }
+      if (payload.type === "partial") { asrTranscript = payload.text || ""; asrPreview = payload.stash || ""; refreshAsrDraft(); return; }
+      if (payload.type === "final") { asrTranscript = payload.text || ""; asrPreview = ""; refreshAsrDraft(); return; }
+      if (payload.type === "finished") { finishRecording("识别完成，请检查后发送"); return; }
+      if (payload.type === "error") { appendMessage("system", "语音识别失败：" + (payload.message || "未知错误")); finishRecording("语音识别失败"); }
+    });
+    asrSocket.addEventListener("close", function() {
+      if (recording || awaitingAsrFinish) finishRecording("语音会话已关闭");
+    });
+    asrSocket.addEventListener("error", function() {
+      appendMessage("system", "实时语音识别连接异常。");
+      finishRecording("语音识别连接异常");
+    });
+  }
+
+  function stopRecording() {
+    if (!recording || awaitingAsrFinish || !asrSocket || asrSocket.readyState !== WebSocket.OPEN) return;
+    awaitingAsrFinish = true;
+    updateControls();
+    setVoiceStatus("正在结束语音识别...");
+    cleanupRecordingResources();
+    asrSocket.send(JSON.stringify({type: "stop"}));
+  }
+
+  // ===== Event listeners =====
+  sendButton.addEventListener("click", function() { sendMessage(); });
+  messageInput.addEventListener("keydown", function(evt) {
+    if (evt.key === "Enter" && !evt.shiftKey) { evt.preventDefault(); sendMessage(); }
+  });
+
+  micButton.addEventListener("click", function() {
+    if (recording) stopRecording();
+    else startRecording();
+  });
+
+  newSessionButton.addEventListener("click", resetSession);
+  newSessionBtn2.addEventListener("click", resetSession);
+
+  document.querySelectorAll(".hero-suggestion").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      sendMessage(btn.getAttribute("data-text"));
+    });
+  });
+
+  // Init
+  resetSession();
+  updateControls();
+  loadFieldOptions();
+})();
+</script>
 </html>

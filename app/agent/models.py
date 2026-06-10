@@ -6,7 +6,12 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.company_agent.models import CompanyResolveResponse
 from app.agent.enums import validate_structured_patch
+from app.location_agent.models import (
+    CurrentCoordinates as LocationCurrentCoordinates,
+    LocationAgentResponse as StandaloneLocationAgentResponse,
+)
 
 
 class SessionStage(str, Enum):
@@ -30,22 +35,24 @@ class NextActionType(str, Enum):
     GUIDE_USER = "guide_user"
 
 
+class ActiveFlow(str, Enum):
+    MAIN = "main"
+    COMPANY = "company"
+    LOCATION = "location"
+
+
 class LocationFlowStatus(str, Enum):
     IDLE = "idle"
-    AWAITING_CURRENT_LOCATION = "awaiting_current_location"
-    AWAITING_SEARCH_SELECTION = "awaiting_search_selection"
-    AWAITING_NEARBY_SELECTION = "awaiting_nearby_selection"
-    AWAITING_MANUAL_INPUT = "awaiting_manual_input"
-    AWAITING_USER_CONFIRMATION = "awaiting_user_confirmation"
-    RESOLVED = "resolved"
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
 
 
-class AddressActionType(str, Enum):
-    RESOLVE_TEXT = "resolve_text"
-    USE_CURRENT_LOCATION = "use_current_location"
-    CONFIRM_CANDIDATE = "confirm_candidate"
-    SKIP = "skip"
-    RESUME = "resume"
+class CompanyFlowStatus(str, Enum):
+    IDLE = "idle"
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
 
 
 class MainInfo(BaseModel):
@@ -145,6 +152,26 @@ class FieldMeta(BaseModel):
     updated_at: datetime | None = None
 
 
+class LocationFlowSnapshot(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: LocationFlowStatus = LocationFlowStatus.IDLE
+    site_index: int = 0
+    prompt_mode: str | None = None
+    site_context_label: str | None = None
+    original_user_message: str | None = None
+    current_coordinates: LocationCurrentCoordinates | None = None
+    last_response: StandaloneLocationAgentResponse | None = None
+
+
+class CompanyFlowSnapshot(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: CompanyFlowStatus = CompanyFlowStatus.IDLE
+    original_user_message: str | None = None
+    last_response: CompanyResolveResponse | None = None
+
+
 class SessionState(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -161,8 +188,10 @@ class SessionState(BaseModel):
     turn_count: int = 0
     history_summary: str = ""
     field_meta: dict[str, FieldMeta] = Field(default_factory=dict)
-    location_state: "LocationState" = Field(default_factory=lambda: LocationState())
     created_result: dict[str, Any] | None = None
+    active_flow: ActiveFlow = ActiveFlow.MAIN
+    company_flow: CompanyFlowSnapshot = Field(default_factory=CompanyFlowSnapshot)
+    location_flow: LocationFlowSnapshot = Field(default_factory=LocationFlowSnapshot)
 
 
 class ChatRequest(BaseModel):
@@ -192,56 +221,54 @@ class CurrentLocation(BaseModel):
     accuracyMeters: float | None = None
 
 
-class LocationCandidate(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    candidate_id: str
-    name: str | None = None
-    fullAddress: str
-    provinceName: str | None = None
-    cityName: str | None = None
-    districtName: str | None = None
-    formattedAddress: str | None = None
-    latitude: float | None = None
-    longitude: float | None = None
-    geoSource: str | None = None
-    confidence: str | None = None
-
-
-class LocationState(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    status: LocationFlowStatus = LocationFlowStatus.IDLE
-    dismissed: bool = False
-    pending_full_address: str | None = None
-    current_location: CurrentLocation | None = None
-    candidates: list[LocationCandidate] = Field(default_factory=list)
-    normalized_site: Site | None = None
-    suggested_reply: str | None = None
-
-
-class AddressConfirmationPayload(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    active: bool
-    status: LocationFlowStatus
-    message: str
-    pending_full_address: str | None = None
-    candidates: list[LocationCandidate] = Field(default_factory=list)
-    normalized_site: Site | None = None
-    can_skip: bool = True
-    can_use_current_location: bool = True
-
-
 class AddressResolutionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     session_id: str
     site_index: int = 0
-    action: AddressActionType = AddressActionType.RESOLVE_TEXT
     full_address: str | None = None
     current_location: CurrentLocation | None = None
-    candidate_id: str | None = None
+
+
+class LocationFlowSyncRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    session_id: str
+    site_index: int = 0
+    original_user_message: str | None = None
+    current_coordinates: LocationCurrentCoordinates | None = None
+    location_agent_response: StandaloneLocationAgentResponse
+
+
+class LocationCommitRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    session_id: str
+    site_index: int = 0
+    location_agent_response: StandaloneLocationAgentResponse
+
+
+class CompanyFlowSyncRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    session_id: str
+    original_user_message: str | None = None
+    company_agent_response: CompanyResolveResponse
+
+
+class CompanyCommitRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    session_id: str
+    company_name: str
+    company_agent_response: CompanyResolveResponse | None = None
+
+
+class CompanySearchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    session_id: str
+    keyword: str
 
 
 class ChatResponse(BaseModel):
@@ -250,10 +277,12 @@ class ChatResponse(BaseModel):
     session_id: str
     reply: str
     stage: SessionStage
+    active_flow: ActiveFlow = ActiveFlow.MAIN
+    company_flow: CompanyFlowSnapshot | None = None
+    location_flow: LocationFlowSnapshot | None = None
     missing_required_fields: list[str] = Field(default_factory=list)
     validation_results: dict[str, ValidationResult] = Field(default_factory=dict)
     state_summary: dict[str, Any] = Field(default_factory=dict)
-    address_confirmation: AddressConfirmationPayload | None = None
     created_result: dict[str, Any] | None = None
 
 
@@ -264,15 +293,8 @@ class AddressResolutionResponse(BaseModel):
     site_index: int = 0
     resolution_status: str
     message: str
-    stage: SessionStage | None = None
-    suggested_reply: str | None = None
     current_location: CurrentLocation | None = None
     full_address: str | None = None
-    missing_required_fields: list[str] = Field(default_factory=list)
-    state_summary: dict[str, Any] = Field(default_factory=dict)
-    candidates: list[LocationCandidate] = Field(default_factory=list)
-    location_state: LocationState | None = None
-    address_confirmation: AddressConfirmationPayload | None = None
     normalized_site: Site | None = None
 
 
