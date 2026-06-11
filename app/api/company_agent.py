@@ -3,11 +3,14 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from app.company_agent.models import CompanyResolveRequest, CompanyResolveResponse
+from app.company_agent.runtime_facade import CompanyAgentRuntimeFacade
 from app.company_agent.service import CompanyAgentService
 from app.integrations.qixin import QixinConfigError, QixinUpstreamError
 
 router = APIRouter(prefix="/api/company", tags=["company-agent"])
-service = CompanyAgentService()
+service = CompanyAgentRuntimeFacade(
+    legacy_service=CompanyAgentService(),
+)
 
 
 @router.post("/resolve", response_model=CompanyResolveResponse)

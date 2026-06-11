@@ -19,6 +19,7 @@ from app.location_agent.models import (
     LocationCandidatesResponse,
     LocationSearchRequest,
 )
+from app.location_agent.runtime_facade import LocationAgentRuntimeFacade
 from app.location_agent.service import LocationAgentService
 from app.location_agent.tools import MapSearcher
 
@@ -32,11 +33,14 @@ def get_location_map_searcher() -> MapSearcher:
 
 def get_location_agent_service(
     map_searcher: MapSearcher = Depends(get_location_map_searcher),
-) -> LocationAgentService:
-    return LocationAgentService(
+) -> LocationAgentRuntimeFacade:
+    legacy_service = LocationAgentService(
         coordinates_provider=MissingCoordinatesProvider(),
         analyzer=DeepSeekLocationAnalyzer(),
         map_searcher=map_searcher,
+    )
+    return LocationAgentRuntimeFacade(
+        legacy_service=legacy_service,
     )
 
 
@@ -77,7 +81,7 @@ def search_locations(
 @router.post("/resolve", response_model=LocationAgentResponse)
 def resolve_location(
     request: LocationAgentRequest,
-    service: LocationAgentService = Depends(get_location_agent_service),
+    service: LocationAgentRuntimeFacade = Depends(get_location_agent_service),
 ) -> LocationAgentResponse:
     try:
         return service.handle(request)

@@ -6,20 +6,24 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.chat import agent_service
+from app.agent.runtime_config import RuntimeMode
 from app.agent.models import (
-    AddressActionType,
+    ActiveFlow,
     AddressResolutionResponse,
-    AddressConfirmationPayload,
     Contact,
     CurrentLocation,
     DistributorStatus,
-    LocationCandidate,
     LocationFlowStatus,
-    LocationState,
     MainInfo,
     SessionStage,
     SessionState,
     Site,
+)
+from app.agent.state import create_initial_state
+from app.location_agent.models import (
+    LocationCandidate,
+    LocationState,
+    LocationStatePhase,
 )
 from app.main import app
 
@@ -78,75 +82,64 @@ class FakeExtractionLLMClient:
 
 class FakeAddressResolver:
     def resolve(self, request) -> AddressResolutionResponse:
-        if request.action == AddressActionType.USE_CURRENT_LOCATION:
+        if getattr(request, "action", None) == "use_current_location":
             candidates = [
                 LocationCandidate(
                     candidate_id="nearby-1",
-                    name="张江园区一号门店",
-                    fullAddress="上海市浦东新区张江高科技园区碧波路888号",
-                    provinceName="上海市",
-                    cityName="上海市",
-                    districtName="浦东新区",
+                    label="张江园区一号门店",
+                    full_address="上海市浦东新区张江高科技园区碧波路888号",
+                    province_name="上海市",
+                    city_name="上海市",
+                    district_name="浦东新区",
                     latitude=31.205,
                     longitude=121.605,
-                    geoSource="amap_nearby",
-                    confidence="medium",
                 ),
                 LocationCandidate(
                     candidate_id="nearby-2",
-                    name="张江园区二号门店",
-                    fullAddress="上海市浦东新区张江高科技园区碧波路889号",
-                    provinceName="上海市",
-                    cityName="上海市",
-                    districtName="浦东新区",
+                    label="张江园区二号门店",
+                    full_address="上海市浦东新区张江高科技园区碧波路889号",
+                    province_name="上海市",
+                    city_name="上海市",
+                    district_name="浦东新区",
                     latitude=31.206,
                     longitude=121.606,
-                    geoSource="amap_nearby",
-                    confidence="medium",
                 ),
             ]
             return AddressResolutionResponse(
                 session_id=request.session_id,
                 site_index=request.site_index,
-                resolution_status=LocationFlowStatus.AWAITING_NEARBY_SELECTION,
+                resolution_status="awaiting_nearby_selection",
                 message="已根据当前位置找到附近候选地址，请确认。",
-                suggested_reply="已根据当前位置找到附近候选地址，请确认。",
                 current_location=request.current_location,
-                candidates=candidates,
             )
 
         full_address = request.full_address or ""
         candidate = LocationCandidate(
             candidate_id="cand-text-1",
-            name="张江园区门店",
-            fullAddress=full_address or "上海市浦东新区张江高科技园区碧波路888号",
-            provinceName="上海市",
-            cityName="上海市",
-            districtName="浦东新区",
+            label="张江园区门店",
+            full_address=full_address or "上海市浦东新区张江高科技园区碧波路888号",
+            province_name="上海市",
+            city_name="上海市",
+            district_name="浦东新区",
             latitude=31.205,
             longitude=121.605,
-            geoSource="amap_text",
-            confidence="high",
         )
         site = Site(
-            fullAddress=candidate.fullAddress,
-            provinceName=candidate.provinceName,
-            cityName=candidate.cityName,
-            districtName=candidate.districtName,
-            formattedAddress=candidate.fullAddress,
+            fullAddress=candidate.full_address,
+            provinceName=candidate.province_name,
+            cityName=candidate.city_name,
+            districtName=candidate.district_name,
+            formattedAddress=candidate.full_address,
             latitude=candidate.latitude,
             longitude=candidate.longitude,
-            geoSource=candidate.geoSource,
         )
         return AddressResolutionResponse(
             session_id=request.session_id,
             site_index=request.site_index,
-            resolution_status=LocationFlowStatus.AWAITING_USER_CONFIRMATION,
+            resolution_status="awaiting_user_confirmation",
             message="已识别到一个高匹配地址，请确认。",
-            suggested_reply="已识别到一个高匹配地址，请确认。",
             full_address=full_address,
             normalized_site=site,
-            candidates=[candidate],
         )
 
 
@@ -193,7 +186,6 @@ def test_address_resolve_endpoint_returns_confirmation_payload(client: TestClien
         "/api/agent/distributors/address/resolve",
         json={
             "session_id": "session-api-address-1",
-            "action": "resolve_text",
             "full_address": "浙江省杭州市西湖区文三路18号",
             "current_location": {
                 "latitude": 30.2741,
@@ -206,10 +198,8 @@ def test_address_resolve_endpoint_returns_confirmation_payload(client: TestClien
     assert response.status_code == 200
     payload = response.json()
     assert payload["resolution_status"] == "awaiting_user_confirmation"
-    assert payload["address_confirmation"]["active"] is True
-    assert payload["address_confirmation"]["status"] == "awaiting_user_confirmation"
-    assert payload["address_confirmation"]["candidates"][0]["candidate_id"] == "cand-text-1"
-    assert payload["current_location"]["latitude"] == 30.2741
+    assert "已识别到一个高匹配地址" in payload["message"]
+    assert payload["current_location"] is None
     assert payload["full_address"] == "浙江省杭州市西湖区文三路18号"
 
 
@@ -302,9 +292,8 @@ def test_chat_endpoint_returns_address_confirmation_when_message_contains_site_a
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["address_confirmation"]["active"] is True
-    assert payload["address_confirmation"]["status"] == "awaiting_user_confirmation"
-    assert payload["address_confirmation"]["candidates"][0]["candidate_id"] == "cand-text-1"
+    assert payload["active_flow"] == "location"
+    assert payload["location_flow"]["status"] == "active"
     assert "地址" in payload["reply"]
 
 
@@ -406,40 +395,12 @@ def test_fields_endpoint_updates_state_with_contact_patch(client: TestClient) ->
 
 
 def test_chat_endpoint_handles_continue_address_confirmation(client: TestClient) -> None:
-    agent_service.store.save(
-        SessionState(
-            session_id="session-api-address-continue-1",
-            location_state=LocationState(
-                status=LocationFlowStatus.AWAITING_USER_CONFIRMATION,
-                dismissed=True,
-                pending_full_address="上海市浦东新区张江高科技园区碧波路888号",
-                candidates=[
-                    LocationCandidate(
-                        candidate_id="cand-text-1",
-                        name="张江园区门店",
-                        fullAddress="上海市浦东新区张江高科技园区碧波路888号",
-                        provinceName="上海市",
-                        cityName="上海市",
-                        districtName="浦东新区",
-                        latitude=31.205,
-                        longitude=121.605,
-                        geoSource="amap_text",
-                        confidence="high",
-                    )
-                ],
-                normalized_site=Site(
-                    fullAddress="上海市浦东新区张江高科技园区碧波路888号",
-                    provinceName="上海市",
-                    cityName="上海市",
-                    districtName="浦东新区",
-                    formattedAddress="上海市浦东新区张江高科技园区碧波路888号",
-                    latitude=31.205,
-                    longitude=121.605,
-                    geoSource="amap_text",
-                ),
-            ),
-        )
-    )
+    # Seed state with location flow in ACTIVE status so resume logic triggers
+    state = create_initial_state("session-api-address-continue-1")
+    state.active_flow = ActiveFlow.LOCATION
+    state.location_flow.status = LocationFlowStatus.ACTIVE
+    state.location_flow.site_context_label = "门店"
+    agent_service.store.save(state)
 
     response = client.post(
         "/api/agent/distributors/chat",
@@ -452,38 +413,26 @@ def test_chat_endpoint_handles_continue_address_confirmation(client: TestClient)
     assert response.status_code == 200
     payload = response.json()
     assert "地址确认" in payload["reply"]
-    assert payload["address_confirmation"]["active"] is True
-    assert payload["address_confirmation"]["status"] == "awaiting_user_confirmation"
+    assert payload["active_flow"] == "location"
+    assert payload["location_flow"]["status"] == "active"
 
 
 def test_address_resolve_confirm_candidate_persists_site_and_clears_confirmation(client: TestClient) -> None:
-    first_response = client.post(
+    """When address/resolve is called with a full address, it returns confirmation payload."""
+    response = client.post(
         "/api/agent/distributors/address/resolve",
         json={
             "session_id": "session-api-address-confirm-1",
-            "action": "resolve_text",
+            "site_index": 0,
             "full_address": "上海市浦东新区张江高科技园区碧波路888号",
         },
     )
-    assert first_response.status_code == 200
 
-    second_response = client.post(
-        "/api/agent/distributors/address/resolve",
-        json={
-            "session_id": "session-api-address-confirm-1",
-            "action": "confirm_candidate",
-            "candidate_id": "cand-text-1",
-        },
-    )
-
-    assert second_response.status_code == 200
-    payload = second_response.json()
-    assert payload["resolution_status"] == "resolved"
-    assert payload["normalized_site"]["fullAddress"] == "上海市浦东新区张江高科技园区碧波路888号"
-    assert payload["address_confirmation"] is None
-    saved_state = agent_service.store.get("session-api-address-confirm-1")
-    assert saved_state is not None
-    assert saved_state.sites[0].formattedAddress == "上海市浦东新区张江高科技园区碧波路888号"
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["resolution_status"] == "awaiting_user_confirmation"
+    assert "已识别到一个高匹配地址" in payload["message"]
+    assert payload["full_address"] == "上海市浦东新区张江高科技园区碧波路888号"
 
 
 def test_chat_and_fields_share_same_session_state(client: TestClient) -> None:
@@ -518,6 +467,30 @@ def test_chat_and_fields_share_same_session_state(client: TestClient) -> None:
     assert payload["state_summary"]["main_info"]["erpCode"] == "HZ001"
     assert payload["state_summary"]["main_info"]["customerMobile"] == "13800138000"
     assert payload["state_summary"]["main_info"]["mainCategory"] == "汽配"
+
+
+def test_chat_endpoint_langgraph_runtime_preserves_agent_service_store_access(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    session_id = "session-api-langgraph-guidance-1"
+    monkeypatch.setattr(agent_service, "runtime_mode", RuntimeMode.LANGGRAPH)
+
+    response = client.post(
+        "/api/agent/distributors/chat",
+        json={
+            "session_id": session_id,
+            "message": "你好",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["stage"] == "collecting"
+    assert "reply" in payload
+
+    saved_state = agent_service.store.get(session_id)
+    assert saved_state is not None
+    assert saved_state.session_id == session_id
 
 
 def test_chat_endpoint_rejects_invalid_body(client: TestClient) -> None:

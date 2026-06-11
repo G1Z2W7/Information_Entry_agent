@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, WebSocket
 
 from app.agent.asr_realtime import bridge_qwen_realtime_asr
+from app.agent.graph.distributor_graph import DistributorGraphRuntime
 from app.agent.models import (
     AddressResolutionRequest,
     AddressResolutionResponse,
@@ -14,14 +15,23 @@ from app.agent.models import (
     LocationFlowSyncRequest,
     StructuredPatchRequest,
 )
+from app.agent.runtime_config import RuntimeSelectionError
+from app.agent.runtime_facade import DistributorRuntimeFacade
 from app.agent.service import AgentService
 
 
 router = APIRouter(prefix="/api/agent/distributors", tags=["distributor-agent"])
-agent_service = AgentService()
+legacy_service = AgentService()
+agent_service = DistributorRuntimeFacade(
+    legacy_service=legacy_service,
+    langgraph_runtime=DistributorGraphRuntime(
+        store=legacy_service.store,
+        legacy_service=legacy_service,
+    ),
+)
 
 
-def get_agent_service() -> AgentService:
+def get_agent_service() -> DistributorRuntimeFacade:
     return agent_service
 
 
@@ -45,7 +55,7 @@ async def realtime_asr(websocket: WebSocket) -> None:
 
 @router.get("/field-options", response_model=FieldOptionsResponse)
 def field_options(
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> FieldOptionsResponse:
     return service.get_field_options()
 
@@ -53,7 +63,7 @@ def field_options(
 @router.post("/address/resolve", response_model=AddressResolutionResponse)
 def resolve_address(
     request: AddressResolutionRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> AddressResolutionResponse:
     return service.resolve_address(request)
 
@@ -61,10 +71,12 @@ def resolve_address(
 @router.post("/chat", response_model=ChatResponse)
 def chat(
     request: ChatRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
     try:
         return service.process_chat(request.session_id, request.message)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -72,34 +84,45 @@ def chat(
 @router.patch("/fields", response_model=ChatResponse)
 def patch_fields(
     request: StructuredPatchRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
-    return service.process_structured_patch(request.session_id, request.patch)
+    try:
+        return service.process_structured_patch(request.session_id, request.patch)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/company/search", response_model=ChatResponse)
 def search_company_candidates(
     request: CompanySearchRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
-    return service.search_company_candidates(request)
+    try:
+        return service.search_company_candidates(request)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/company/sync", response_model=ChatResponse)
 def sync_company_flow(
     request: CompanyFlowSyncRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
-    return service.sync_company_flow(request)
+    try:
+        return service.sync_company_flow(request)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/company/commit", response_model=ChatResponse)
 def commit_company_flow(
     request: CompanyCommitRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
     try:
         return service.commit_company_flow(request)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -107,17 +130,22 @@ def commit_company_flow(
 @router.post("/location/sync", response_model=ChatResponse)
 def sync_location_flow(
     request: LocationFlowSyncRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
-    return service.sync_location_flow(request)
+    try:
+        return service.sync_location_flow(request)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/location/commit", response_model=ChatResponse)
 def commit_location_flow(
     request: LocationCommitRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: DistributorRuntimeFacade = Depends(get_agent_service),
 ) -> ChatResponse:
     try:
         return service.commit_location_flow(request)
+    except RuntimeSelectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
